@@ -71,7 +71,6 @@ map <leader>k <C-W>k
 map <leader>h <C-W>h
 map <leader>l <C-W>l
 
-" My mappings for managing tabs
 "0 or s: Find this C symbol
 "1 or g: Find this definition
 "2 or d: Find functions called by this function
@@ -151,5 +150,3 @@ set statusline+=%y      "filetype
 set statusline+=%h      "help file flag
 set statusline+=%m      "modified flag
 set statusline+=%r      "read only flag
-
-
