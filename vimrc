@@ -2,6 +2,17 @@
 filetype plugin on
 filetype indent on
 
+colorscheme desert
+"colorscheme koehler 
+"colorscheme solarized 
+"colorscheme darkblue 
+if &diff
+    colorscheme pablo 
+endif
+
+" Set mouse scrolling for normal mode
+set mouse=n
+
 set cst
 set csto=0
 set history=1000                " Store a ton of history (default
@@ -36,41 +47,61 @@ set smartcase
 set laststatus=2
 set title
 
+" Ctags
+set tags+=~/.vim/systags
+set tags+=/workspace/sw/vinodkri/softwares/dpdk-2.2.0/tags
+imap <C-o> <C-x><C-o>
+
 " like <leader>w saves the current file
 let mapleader = ","
 let g:mapleader = ","
 
-" Fast saving
-nmap <leader>w :w!<cr>
 " Fast quiting 
 nmap <leader>q :q!<cr>
+" Fast saving
+nmap <leader>w :w!<cr>
 " Fast saving & quitting
 nmap <leader>e :wq!<cr>
-" Traversing 
-map f <S-w>
-"noremap <S-w> <w>
+" Fast quiting all
+nmap <leader>qa :qall<cr>
+" Fast saving all
+nmap <leader>wa :wall<cr>
+" Fast saving & quitting all
+nmap <leader>ea :wqall<cr>
 
 " Disable highlight when <leader><cr> is pressed
-map <silent> <leader><cr> :noh<cr>
+noremap<silent> <leader><cr> :noh<cr>
 
+noremap <C-j> J 
 " My  Mappings for managing tabs
 set path=.,,**
-map <leader>tn :tabnew<cr>
-map <leader>to :tabonly<cr>
-map <leader>tc :tabclose<cr>
-map <leader>tm :tabmove
-map <leader>tf :tabfind
-map <leader>tls :tabs<cr>
-map <leader>tsp :tab split<cr>
-map <leader>m gt
-map <leader>n gT
+noremap<leader>tn :tabnew<cr>
+noremap<leader>to :tabonly<cr>
+noremap<leader>tc :tabclose<cr>
+noremap<leader>tm :tabmove
+noremap<leader>tf :tabfind
+noremap<leader>tls :tabs<cr>
+noremap<leader>tsp :tab split<cr>
+noremap<leader>m gt
+noremap<leader>. gT
+noremap<leader>n <C-W><S-t>
 
 " Smart way to move between windows
-map <leader>j <C-W>j
-map <leader>k <C-W>k
-map <leader>h <C-W>h
-map <leader>l <C-W>l
+noremap <leader>j <C-W>j
+noremap <leader>k <C-W>k
+noremap <leader>h <C-W>h
+noremap <leader>l <C-W>l
 
+nnoremap <leader>d :setlocal number!<cr>
+
+" Maps Alt-[h,j,k,l] to resizing a window split
+nnoremap <S-h> <C-w><
+nnoremap <S-l> <C-w>>
+nnoremap <S-k> <C-W>-
+nnoremap <S-j> <C-W>+
+nnoremap <leader>x <C-W>x
+
+" My mappings for managing tabs
 "0 or s: Find this C symbol
 "1 or g: Find this definition
 "2 or d: Find functions called by this function
@@ -80,37 +111,37 @@ map <leader>l <C-W>l
 "7 or f: Find this file
 "8 or i: Find files #including this file
 
-map <leader>cs b"zyw:exe "tab cs find 0 ".@z.""<CR>
-map <leader>cg b"zyw:exe "tab cs find 1 ".@z.""<CR>
-map <leader>cd b"zyw:exe "tab cs find 2 ".@z.""<CR>
-map <leader>cc b"zyw:exe "tab cs find 3 ".@z.""<CR>
-map <leader>ct b"zyw:exe "tab cs find 4 ".@z.""<CR>
-map <leader>ce b"zyw:exe "tab cs find 6 ".@z.""<CR>
-map <leader>cf b"zyw:exe "tab cs find 7 ".@z.""<CR>
-map <leader>ci b"zyw:exe "tab cs find 8 ".@z.""<CR>
+noremap<leader>cs b"zyw:exe "tab cs find 0 ".@z.""<CR>
+noremap<leader>cg b"zyw:exe "tab cs find 1 ".@z.""<CR>
+noremap<leader>cd b"zyw:exe "tab cs find 2 ".@z.""<CR>
+noremap<leader>cc b"zyw:exe "tab cs find 3 ".@z.""<CR>
+noremap<leader>ct b"zyw:exe "tab cs find 4 ".@z.""<CR>
+noremap<leader>ce b"zyw:exe "tab cs find 6 ".@z.""<CR>
+noremap<leader>cf b"zyw:exe "tab cs find 7 ".@z.""<CR>
+noremap<leader>ci b"zyw:exe "tab cs find 8 ".@z.""<CR>
 
 " Using ',hcX' searches current word and makes the vim
 " window split horizontally, with search result displayed
 " in the new window.
-map <leader>hcs b"zyw:exe "scs find 0 ".@z.""<CR>
-map <leader>hcg b"zyw:exe "scs find 1 ".@z.""<CR>
-map <leader>hcd b"zyw:exe "scs find 2 ".@z.""<CR>
-map <leader>hcc b"zyw:exe "scs find 3 ".@z.""<CR>
-map <leader>hct b"zyw:exe "scs find 4 ".@z.""<CR>
-map <leader>hce b"zyw:exe "scs find 6 ".@z.""<CR>
-map <leader>hcf b"zyw:exe "scs find 7 ".@z.""<CR>
-map <leader>hci b"zyw:exe "scs find 8 ".@z.""<CR>
+noremap<leader>hcs b"zyw:exe "scs find 0 ".@z.""<CR>
+noremap<leader>hcg b"zyw:exe "scs find 1 ".@z.""<CR>
+noremap<leader>hcd b"zyw:exe "scs find 2 ".@z.""<CR>
+noremap<leader>hcc b"zyw:exe "scs find 3 ".@z.""<CR>
+noremap<leader>hct b"zyw:exe "scs find 4 ".@z.""<CR>
+noremap<leader>hce b"zyw:exe "scs find 6 ".@z.""<CR>
+noremap<leader>hcf b"zyw:exe "scs find 7 ".@z.""<CR>
+noremap<leader>hci b"zyw:exe "scs find 8 ".@z.""<CR>
 
 " Hitting ',vcsX' searches current word and does a vertical
 " split instead of a horizontal one
-map <leader>vcs b"zyw:exe "vert scs find 0 ".@z.""<CR>
-map <leader>vcg b"zyw:exe "vert scs find 1 ".@z.""<CR>
-map <leader>vcd b"zyw:exe "vert scs find 2 ".@z.""<CR>
-map <leader>vcc b"zyw:exe "vert scs find 3 ".@z.""<CR>
-map <leader>vct b"zyw:exe "vert scs find 4 ".@z.""<CR>
-map <leader>vce b"zyw:exe "vert scs find 6 ".@z.""<CR>
-map <leader>vcf b"zyw:exe "vert scs find 7 ".@z.""<CR>
-map <leader>vci b"zyw:exe "vert scs find 8 ".@z.""<CR>
+noremap<leader>vcs b"zyw:exe "vert scs find 0 ".@z.""<CR>
+noremap<leader>vcg b"zyw:exe "vert scs find 1 ".@z.""<CR>
+noremap<leader>vcd b"zyw:exe "vert scs find 2 ".@z.""<CR>
+noremap<leader>vcc b"zyw:exe "vert scs find 3 ".@z.""<CR>
+noremap<leader>vct b"zyw:exe "vert scs find 4 ".@z.""<CR>
+noremap<leader>vce b"zyw:exe "vert scs find 6 ".@z.""<CR>
+noremap<leader>vcf b"zyw:exe "vert scs find 7 ".@z.""<CR>
+noremap<leader>vci b"zyw:exe "vert scs find 8 ".@z.""<CR>
 
 " Return to last edit position when opening files (You want this!)
 autocmd BufReadPost *
@@ -122,9 +153,7 @@ set viminfo^=%
 
 " Opens a new tab with the current buffer's path
 " Super useful when editing files in the same directory
-map <leader>te :tabedit <c-r>=expand("%:p:h")<cr>/
-
-colorscheme desert
+noremap<leader>te :tabedit <c-r>=expand("%:p:h")<cr>/
 
 function! InsertStatuslineColor(mode)
   if a:mode == 'i'
@@ -140,7 +169,7 @@ au InsertEnter * call InsertStatuslineColor(v:insertmode)
 au InsertLeave * hi statusline guibg=DarkGrey ctermfg=8 guifg=White ctermbg=15
 
 " default the statusline to green when entering Vim
- hi statusline guibg=DarkGrey ctermfg=8 guifg=White ctermbg=15
+hi statusline guibg=DarkGrey ctermfg=8 guifg=White ctermbg=15
 
 " " Formats the statusline
 set statusline+=%F\ %l\:%c
@@ -150,3 +179,10 @@ set statusline+=%y      "filetype
 set statusline+=%h      "help file flag
 set statusline+=%m      "modified flag
 set statusline+=%r      "read only flag
+
+vmap `c :s/^/\/*/<cr>gv:s/$/*\//<cr>:noh<cr>i
+vmap `r :s/^\/\*//<cr>gv:s/\*\/$/<cr>:noh<cr>i
+
+let maplocalleader = "`"
+autocmd FileType c nnoremap <buffer> <localleader>c I//<esc>
+autocmd FileType python     nnoremap <buffer> <localleader>c I#<esc>
