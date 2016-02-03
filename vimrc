@@ -12,7 +12,6 @@ endif
 
 " Set mouse scrolling for normal mode
 set mouse=n
-
 set cst
 set csto=0
 set history=1000                " Store a ton of history (default
@@ -143,6 +142,27 @@ noremap<leader>vce b"zyw:exe "vert scs find 6 ".@z.""<CR>
 noremap<leader>vcf b"zyw:exe "vert scs find 7 ".@z.""<CR>
 noremap<leader>vci b"zyw:exe "vert scs find 8 ".@z.""<CR>
 
+" Escape
+inoremap jj <Esc>
+
+"Copy to Clipboard
+noremap<leader>ya "ayy
+noremap<leader>ys "syy
+noremap<leader>yd "dyy
+noremap<leader>yf "fyy
+noremap<leader>ye "eyy
+
+"Append to clipboard
+noremap<leader>yA "Ayy
+
+"Paste from clipboard
+noremap<leader>p "0p
+noremap<leader>pa "ap
+noremap<leader>ps "sp
+noremap<leader>pd "dp
+noremap<leader>pf "fp
+noremap<leader>pe "ep
+
 " Return to last edit position when opening files (You want this!)
 autocmd BufReadPost *
  \ if line("'\"") > 0 && line("'\"") <= line("$") |
@@ -165,8 +185,17 @@ function! InsertStatuslineColor(mode)
   endif
 endfunction
 
-au InsertEnter * call InsertStatuslineColor(v:insertmode)
-au InsertLeave * hi statusline guibg=DarkGrey ctermfg=8 guifg=White ctermbg=15
+function! InsertModeEnter()
+  call InsertStatuslineColor(v:insertmode)
+endfunction
+
+function! InsertModeLeave()
+  hi statusline guibg=DarkGrey ctermfg=8 guifg=White ctermbg=15
+endfunction
+
+"au InsertEnter * call InsertStatuslineColor(v:insertmode)
+au InsertEnter * call InsertModeEnter()
+au InsertLeave * call InsertModeLeave()
 
 " default the statusline to green when entering Vim
 hi statusline guibg=DarkGrey ctermfg=8 guifg=White ctermbg=15
@@ -183,6 +212,6 @@ set statusline+=%r      "read only flag
 vmap `c :s/^/\/*/<cr>gv:s/$/*\//<cr>:noh<cr>i
 vmap `r :s/^\/\*//<cr>gv:s/\*\/$/<cr>:noh<cr>i
 
-let maplocalleader = "`"
+let maplocalleader = ";"
 autocmd FileType c nnoremap <buffer> <localleader>c I//<esc>
 autocmd FileType python     nnoremap <buffer> <localleader>c I#<esc>
