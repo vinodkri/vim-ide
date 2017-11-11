@@ -140,9 +140,9 @@ set nocompatible
     "Vim Sessions Settings
         "===========================================================================
         " If you don't want help windows to be restored:
-        set sessionoptions-=help
-        let g:session_autosave_periodic=1
-        let g:session_autosave=1
+     "   set sessionoptions-=help
+     "   let g:session_autosave_periodic=1
+     "   let g:session_autosave=1
     
     "Vim Taboo Setting
         "make vim remember tab names across sessions
@@ -442,6 +442,7 @@ noremap <leader>l <C-W>l
 autocmd FileType c call SetCFiletypeSettings()
 autocmd BufRead *.h  set filetype=c
 autocmd FileType h call SetCFiletypeSettings()
+autocmd FileType qf nmap <buffer> <CR> <CR>
 
 function SetCFiletypeSettings()
     setlocal foldmethod=syntax
