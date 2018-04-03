@@ -1,0 +1,79 @@
+snippet foridx "Description" b
+	for (idx = 0; idx < $1; ++idx)
+	{
+		$0
+	}
+endsnippet
+
+snippet for "Description" b
+	for ($1 = 0; $1 < $2; ++$1)
+	{
+		$0
+	}
+endsnippet
+
+snippet forvs "Description" b
+	for ($1 = 0; $1 < $2; ++$1)
+	{
+		$0${VISUAL}
+	}
+endsnippet
+
+snippet if "Description" b
+	if ($1)
+	{
+		$0
+	}
+endsnippet
+
+snippet ifeq "Description" b
+	if ($1 == $2)
+	{
+		$0
+	}
+endsnippet
+
+snippet ifneq "Description" b
+	if ($1 != $2)
+	{
+		$0
+	}
+endsnippet
+
+snippet ifnulleq "Description" b
+	if (NULL == $1)
+	{
+		$0
+	}
+endsnippet
+
+snippet ifnullneq "Description" b
+	if (NULL != $1)
+	{
+		$0
+	}
+endsnippet
+
+snippet and "Description"
+	($1 && $2)
+endsnippet
+
+snippet or "Description"
+	($1 || $2)
+endsnippet
+
+snippet lt "Description"
+	($1 < $2)
+endsnippet
+
+snippet lteq "Description"
+	($1 <= $2)
+endsnippet
+
+snippet gt "Description"
+	($1 > $2)
+endsnippet
+
+snippet gteq "Description"
+	($1 >= $2)
+endsnippet
