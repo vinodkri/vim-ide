@@ -366,7 +366,7 @@ call vundle#end()
 
 		nmap <silent> ]c :call NextHunkAllBuffers()<CR>
 		nmap <silent> [c :call PrevHunkAllBuffers()<CR>
-        nmap <silent> <leader>w s/\s\+$//
+        "nmap <silent> ]w :%s/\s\+$// <CR>
 
 		function! CleanUp(...)
 			if a:0  " opfunc
@@ -385,6 +385,9 @@ call vundle#end()
 		endfunction
 
 		nmap <silent> <Leader>x :set opfunc=CleanUp<CR>g@
+    "}}}2
+    "VTR {{{2
+        let g:VtrUseVtrMaps = 1
     "}}}2
 "}}}1
 
@@ -530,11 +533,11 @@ call vundle#end()
     command Grep !grep --line-buffered --color=never -r "" * | fzf
     "Function Key's Toggling! {{{2
     "--------------------------------------------------------------------------
-    nnoremap <F6> :call QuickfixToggle()<cr>
-    map <F5> :!cscope -Rb <CR> & :ctags -R<CR> & :cs reset<CR><CR>
+    "nnoremap <F6> :call QuickfixToggle()<cr>
+    "map <F5> :!cscope -Rb <CR> & :ctags -R<CR> & :cs reset<CR><CR>
     "set 2 window scroll
-    map <F7> :set scb!<CR>
-    map <F9> :GitGutterLineHighlightsToggle<CR>
+    map <F1> :set scb!<CR>
+    map <F2> :GitGutterLineHighlightsToggle<CR>
     map <F3> :buffers<CR>:buffer<Space>
     "}}}2
 "}}}1
@@ -689,8 +692,103 @@ call vundle#end()
 
 	    " Opens a new tab with the current buffer's path
 	    " Super useful when editing files in the same directory
-	    noremap<leader>te :tabedit <c-r>=expand("%:p:h")<cr>/
+	    noremap<leader>te :tabedit <c-r>=expand("%:p:h")<CR>/
 	"}}}2
+    "VTR Functions {{{2
+    if !exists('g:pane_for_phy')
+        let g:pane_for_phy = '3'
+    endif
+
+    if !exists('g:pane_for_testmac')
+        let g:pane_for_testmac = '2'
+    endif
+
+    function! InitTestmacFunc(build_server)
+        call AttachToPane(g:pane_for_testmac)
+        execute ':VtrSendCommandToRunner!' . 'ssh cwd'. a:build_server
+        :VtrSendCommandToRunner! cd /workspace/sw/vinodkri/wirelessStack/flexran/npg_wireless-flexran_l1_sw
+        :VtrSendCommandToRunner! . ../scripts/flexran_repo.env
+        :VtrSendCommandToRunner! . ../scripts/testmac.env
+        :VtrSendCommandToRunner! export RTE_WLS=../../../wls_mod
+        :VtrSendCommandToRunner! export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$RTE_WLS
+    endfunction
+
+    function! InitPhyFunc(build_server)
+        call AttachToPane(g:pane_for_phy)
+        execute ':VtrSendCommandToRunner!' . 'ssh cwd'. a:build_server
+        ":VtrSendCommandToRunner! ssh cwd1
+        :VtrSendCommandToRunner! cd /workspace/sw/vinodkri/wirelessStack/flexran/npg_wireless-flexran_l1_sw
+        :VtrSendCommandToRunner! . ../scripts/flexran_repo.env
+    endfunction
+
+    function! BuildTestmacFunc()
+        call AttachToPane(g:pane_for_testmac)
+        :VtrSendCommandToRunner! cd $DIR_WIRELESS/build/lte/testmac
+        :VtrSendCommandToRunner! ../../../../scripts/global_build.sh
+    endfunction
+
+    function! RunTestmacFunc()
+        call AttachToPane(g:pane_for_testmac)
+        :VtrSendCommandToRunner! cd $DIR_WIRELESS/bin/lte/testmac
+        :VtrSendCommandToRunner! ./testmac DIR_WIRELESS_TEST=$DIR_WIRELESS_TEST_4G
+    endfunction
+
+    function! RunPhyFunc()
+        call AttachToPane(g:pane_for_phy)
+        :VtrSendCommandToRunner! cd $DIR_WIRELESS/bin/lte/l1
+        :VtrSendCommandToRunner! umount /mnt/huge
+        :VtrSendCommandToRunner! ./l1.sh -e
+    endfunction
+
+    function! BuildPhyFunc()
+        call AttachToPane(g:pane_for_phy)
+        :VtrSendCommandToRunner! cd $DIR_WIRELESS
+        :VtrSendCommandToRunner! cd ferrybridge/lib; make clean; make
+        :VtrSendCommandToRunner! cd ../../ ; cd wls_mod; ./build.sh clean; ./build.sh;
+        :VtrSendCommandToRunner! cd ../../ ; cd wls_libs/mlog/; ./build.sh clean; ./build.sh;
+        :VtrSendCommandToRunner! cd ../../; cd build/lte/l1app; ./build.sh xclean; ./build.sh
+    endfunction
+
+    function! ExitPhyTestmacFunc()
+        call AttachToPane(g:pane_for_phy)
+        :VtrSendCommandToRunner! exit
+        call AttachToPane(g:pane_for_testmac)
+        :VtrSendCommandToRunner! exit
+    endfunction
+
+    function! RunFDFunc(test_number)
+        call AttachToPane(g:pane_for_testmac)
+        execute ':VtrSendCommandToRunner!'. 'run 2 ' . a:test_number
+    endfunction
+
+    function! RunULFunc(test_number)
+        call AttachToPane(g:pane_for_testmac)
+        execute ':VtrSendCommandToRunner!'. 'run 1 ' . a:test_number
+    endfunction
+
+    function! RunDLFunc(test_number)
+        call AttachToPane(g:pane_for_testmac)
+        execute ':VtrSendCommandToRunner!'. 'run 0 ' . a:test_number
+    endfunction
+
+    command! -bang -nargs=? InitTestmac call g:InitTestmacFunc(<f-args>)
+    command! -bang -nargs=? InitPhy call g:InitPhyFunc(<f-args>)
+    command! RunPhy call g:RunPhyFunc()
+    command! RunTestmac call g:RunTestmacFunc()
+    command! BuildTestmac call g:BuildTestmacFunc()
+    command! BuildPhy call g:BuildPhyFunc()
+    command! ExitApp call g:ExitPhyTestmacFunc()
+    command! -bang -nargs=? RunFD call g:RunFDFunc(<f-args>)
+    command! -bang -nargs=? RunUL call g:RunULFunc(<f-args>)
+    command! -bang -nargs=? RunDL call g:RunDLFunc(<f-args>)
+
+    map <F5> :BuildTestmac<CR>
+    map <F6> :RunTestmac <CR>
+    map <F7> :BuildPhy<CR>
+    map <F8> :RunPhy<CR>
+    map <F9> :ExitApp<CR>
+
+    "}}}2
 "}}}1
 
 "Autocmd Configs {{{1
