@@ -557,6 +557,12 @@ call vundle#end()
         noremap 7` 7<C-W>w
         noremap 8` 8<C-W>w
         noremap 9` 9<C-W>w
+
+        " Window resizing mappings
+        nnoremap <S-Up> :normal <c-r>=Resize('+')<CR><CR>
+        nnoremap <S-Down> :normal <c-r>=Resize('-')<CR><CR>
+        nnoremap <S-Left> :normal <c-r>=Resize('<')<CR><CR>
+        nnoremap <S-Right> :normal <c-r>=Resize('>')<CR><CR>
     "}}}2
 
     "Cscope & Tag Settings {{{2
