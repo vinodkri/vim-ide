@@ -77,3 +77,22 @@ endsnippet
 snippet gteq "Description"
 	($1 >= $2)
 endsnippet
+
+snippet prt "description" b
+printf("$1\n"$2);$0
+endsnippet
+
+global !p
+def complete(t, opts):
+	if t:
+		opts = [ m[len(t):] for m in opts if m.startswith(t) ]
+	if len(opts) == 1:
+		return opts[0]
+	return '(' + '|'.join(opts) + ')'
+endglobal
+
+snippet fapilog "description" b
+FAPI_LOG($1`!p snip.rv=complete(t[1], ['INFO_LOG', 'DEBUG_LOG', 'ERROR_LOG', 'TRACE_LOG'])`, ("[$2`!p snip.rv=complete(t[2], ['FAPI_INT', 'IA_FAPI', 'FAPI WLS'])`] $3",$4));$0
+endsnippet
+
+
