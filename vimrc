@@ -563,6 +563,10 @@ call vundle#end()
         nnoremap <S-Down> :normal <c-r>=Resize('-')<CR><CR>
         nnoremap <S-Left> :normal <c-r>=Resize('<')<CR><CR>
         nnoremap <S-Right> :normal <c-r>=Resize('>')<CR><CR>
+        map <silent> <S-Right> <C-w><
+        map <silent> <S-Down> <C-W>-
+        map <silent> <S-Up> <C-W>+
+        map <silent> <S-Left> <C-w>>
     "}}}2
 
     "Cscope & Tag Settings {{{2
