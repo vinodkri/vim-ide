@@ -99,23 +99,6 @@ call vundle#end()
         let g:fzf_history_dir = '~/.local/share/fzf-history'
 
         "FZF mapping {{{3
-            nmap <C-f>  :Files<CR>
-            nmap <C-f>g :GFiles<CR>
-            nmap <C-f>b  :Buffers<CR>
-            nmap <C-f>w  :Windows<CR>
-            nmap <C-f>l  :Lines<CR>
-            nmap <C-f>bl :BLines<CR>
-            nmap <C-f>t  :Tag<CR>
-            nmap <C-f>bt :BTag<CR>
-            nmap <C-f>s  :Snippets<CR>
-
-            " Insert mode completion
-            imap <c-x><c-k> <plug>(fzf-complete-word)
-            imap <c-x><c-f> <plug>(fzf-complete-path)
-            "imap <c-x><c-j> <plug>(fzf-complete-file-ag)
-            imap <c-x><c-l> <plug>(fzf-complete-line)
-            imap <c-x><c-b> <plug>(fzf-complete-buffer-line)
-
             "Simple MRU search
             command! FZFMru call fzf#run({
                         \ 'source':  reverse(s:all_files()),
@@ -241,15 +224,36 @@ call vundle#end()
             endfunction
 
             command! FZFNeigh call s:fzf_neighbouring_files()
+
+            nmap <C-f>f  :Files<CR>
+            nmap <C-f>g :GFiles<CR>
+            nmap <C-f>b  :Buffers<CR>
+            nmap <C-f>w  :Windows<CR>
+            nmap <C-f>l  :Lines<CR>
+            nmap <C-f>bl :BLines<CR>
+            nmap <C-f>t  :Tag<CR>
+            nmap <C-f>bt :BTag<CR>
+            nmap <C-f>s  :Snippets<CR>
+
+            " Insert mode completion
+            imap <c-x><c-k> <plug>(fzf-complete-word)
+            imap <c-x><c-f> <plug>(fzf-complete-path)
+            "imap <c-x><c-j> <plug>(fzf-complete-file-ag)
+            imap <c-x><c-l> <plug>(fzf-complete-line)
+            imap <c-x><c-b> <plug>(fzf-complete-buffer-line)
+
+            " Better command history with q:
+            command! CmdHist call fzf#vim#command_history({'down': '20'})
+            nnoremap q: :CmdHist<CR>
         "}}}3
 	"}}}2
 
 	"Incsearch Plugin --- {{{2
+        set hlsearch
+        set incsearch
         map /  <Plug>(incsearch-forward)
         map ?  <Plug>(incsearch-backward)
         map g/ <Plug>(incsearch-stay)
-        set hlsearch
-        set incsearch
         map n  <Plug>(incsearch-nohl-n)
         map N  <Plug>(incsearch-nohl-N)
         map *  <Plug>(incsearch-nohl-*)
@@ -282,6 +286,7 @@ call vundle#end()
          "set sessionoptions+=tabpages,globals
          "let g:taboo_tab_format="[%N:%W]%f "
     "}}}2
+
     "{{{2 NerdCommentery
         "Add your own custom formats or override the defaults
         let g:NERDCustomDelimiters = { 'c': { 'left': '//'} }
@@ -291,9 +296,11 @@ call vundle#end()
         " indentation
         let g:NERDDefaultAlign = 'left'
     "}}}2
+
     "Airline Settings {{{2
-        "Tmux settings
         let g:airline_theme='wombat'
+        "Tmux settings
+        let g:airline#extensions#tmuxline#enabled = 1
         let g:tmuxline_separators = {
             \ 'left' : '',
             \ 'left_alt': '|',
@@ -317,9 +324,11 @@ call vundle#end()
         let g:airline#extensions#tabline#show_tabs = 1
         let g:airline#extensions#tabline#tabs_label = 'TABS'
         let g:airline#extensions#tabline#buffers_label = 'BUFFERS'
-         let g:airline#extensions#tabline#formatter = 'unique_tail'
+        let g:airline#extensions#tabline#formatter = 'unique_tail'
+        let g:airline#extensions#tabline#show_buffers = 0
         "let g:airline#extensions#taboo#enabled = 0
     "}}}2
+
     "GitGutter Mappings {{{2
         "Cycle through all hunk changes in all files
         function! NextHunkAllBuffers()
@@ -384,8 +393,9 @@ call vundle#end()
 			endfor
 		endfunction
 
-		nmap <silent> <Leader>x :set opfunc=CleanUp<CR>g@
+		nmap <silent> <leader>x :set opfunc=CleanUp<CR>g@
     "}}}2
+
     "VTR {{{2
         let g:VtrUseVtrMaps = 1
     "}}}2
@@ -402,7 +412,11 @@ call vundle#end()
     set background=dark
     "endif
 
-    colorscheme default
+    if &diff
+        colorscheme elflord 
+    else
+        colorscheme desert
+    endif
 
     syntax enable
     set syntax=on
@@ -410,7 +424,6 @@ call vundle#end()
     set t_ut=
     " Send more characters for redraws
     set ttyfast
-    set nocompatible
     set lazyredraw
 
     " Set this to the name of your terminal that supports mouse codes.
@@ -427,8 +440,8 @@ call vundle#end()
 
     " Set Mouse Scrolling For Normal Mode
     set mouse=n
-    set history=1000                " Store a ton of history default
-    set ul=1000                     " Undo levels
+    set history=1000  " Store a ton of history default
+    set ul=1000  " Undo levels
 
     " Enable persistent undo
     "set undofile   " Maintain undo history between sessions
@@ -437,9 +450,7 @@ call vundle#end()
     "UI config
     set number "Show line numbers
     set relativenumber "Show line numbers
-    set hlsearch
     set laststatus=2
-    set foldenable
 
     set nomagic
 
@@ -447,10 +458,11 @@ call vundle#end()
     highlight Search ctermbg=darkmagenta ctermfg=white
     highlight IncSearch cterm=underline,bold  ctermbg=darkgreen ctermfg=black
     highlight VertSplit ctermbg=darkgreen ctermfg=darkgrey
-    autocmd FileType * setlocal foldmethod=manual
 
+    set foldenable
     setlocal foldmethod=syntax
     setlocal foldlevel=4
+
     let @a = 'vi{:!column -tgv='
     let @s ='gv:!column -tgv='
     let @f =']]k"Wy$2j@f'
@@ -485,6 +497,7 @@ call vundle#end()
     set smartindent
     set textwidth=80
     set infercase
+    set smartcase
 
     " Vim Auto complete
     set complete=.,t,w,d,b,u,i,
@@ -492,7 +505,7 @@ call vundle#end()
     highlight Pmenu ctermbg=darkgreen
     highlight PmenuSel ctermbg=white
     inoremap <C-n> <C-x><C-n>
-    inoremap <C-l> <C-x><C-l>
+    "inoremap <C-l> <C-x><C-l>
     inoremap <C-Tab> <C-x><C-o>
     "Loop through pop completion
     inoremap <expr><tab>   pumvisible() ? "\<C-n>" : "\<tab>"
@@ -516,11 +529,6 @@ call vundle#end()
     noremap Y  y$
     noremap up :s/\<./\u&/g<CR> & :noh<cr>
     noremap <C-@> i<C-@>
-    " Return to last edit position when opening files (You want this!)
-    autocmd BufReadPost *
-     \ if line("'\"") > 0 && line("'\"") <= line("$") |
-     \   exe "normal! g`\"" |
-     \ endif
     " Remember info about open buffers on close
     set viminfo^=%
     set viminfo='100,<50,s10,f1
@@ -668,6 +676,7 @@ call vundle#end()
 		nmap <bs> <C-t>
 		nmap <cr> <c-]>
     "}}}2
+
     " Command line spell corrections {{{2
     cnoreabbrev <expr> W ((getcmdtype() is# ':' && getcmdline() is# 'W')?('w'):('W'))
     cnoreabbrev <expr> Wq ((getcmdtype() is# ':' && getcmdline() is# 'Wq')?('wq'):('Wq'))
@@ -675,6 +684,7 @@ call vundle#end()
     cnoreabbrev <expr> Qa ((getcmdtype() is# ':' && getcmdline() is# 'Qa')?('qa'):('Qa'))
     cnoreabbrev <expr> Q ((getcmdtype() is# ':' && getcmdline() is# 'Q')?('q'):('Q'))
     "}}}2
+
 	" Managing tabs {{{2
 	    noremap <Tab> gt
 	    noremap <S-Tab> gT
@@ -694,100 +704,168 @@ call vundle#end()
 	    " Super useful when editing files in the same directory
 	    noremap<leader>te :tabedit <c-r>=expand("%:p:h")<CR>/
 	"}}}2
+
     "VTR Functions {{{2
-    if !exists('g:pane_for_phy')
-        let g:pane_for_phy = '3'
-    endif
+        if !exists('g:pane_for_phy')
+            let g:pane_for_phy = '3'
+        endif
 
-    if !exists('g:pane_for_testmac')
-        let g:pane_for_testmac = '2'
-    endif
+        if !exists('g:pane_for_testmac')
+            let g:pane_for_testmac = '2'
+        endif
 
-    function! InitTestmacFunc(build_server)
-        call AttachToPane(g:pane_for_testmac)
-        execute ':VtrSendCommandToRunner!' . 'ssh cwd'. a:build_server
-        :VtrSendCommandToRunner! cd /workspace/sw/vinodkri/wirelessStack/flexran/npg_wireless-flexran_l1_sw
-        :VtrSendCommandToRunner! . ../scripts/flexran_repo.env
-        :VtrSendCommandToRunner! . ../scripts/testmac.env
-        :VtrSendCommandToRunner! export RTE_WLS=../../../wls_mod
-        :VtrSendCommandToRunner! export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$RTE_WLS
-    endfunction
+        function! InitTestmacFunc(build_server)
+            call AttachToPane(g:pane_for_testmac)
+            execute ':VtrSendCommandToRunner!' . 'ssh cwd'. a:build_server
+            :VtrSendCommandToRunner! cd /workspace/sw/vinodkri/wirelessStack/flexran/npg_wireless-flexran_l1_sw
+            :VtrSendCommandToRunner! . ../scripts/flexran_repo.env
+            :VtrSendCommandToRunner! . ../scripts/testmac.env
+            :VtrSendCommandToRunner! export RTE_WLS=../../../wls_mod
+            :VtrSendCommandToRunner! export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$RTE_WLS
+        endfunction
 
-    function! InitPhyFunc(build_server)
-        call AttachToPane(g:pane_for_phy)
-        execute ':VtrSendCommandToRunner!' . 'ssh cwd'. a:build_server
-        ":VtrSendCommandToRunner! ssh cwd1
-        :VtrSendCommandToRunner! cd /workspace/sw/vinodkri/wirelessStack/flexran/npg_wireless-flexran_l1_sw
-        :VtrSendCommandToRunner! . ../scripts/flexran_repo.env
-    endfunction
+        function! InitPhyFunc(build_server)
+            call AttachToPane(g:pane_for_phy)
+            execute ':VtrSendCommandToRunner!' . 'ssh cwd'. a:build_server
+            :VtrSendCommandToRunner! cd /workspace/sw/vinodkri/wirelessStack/flexran/npg_wireless-flexran_l1_sw
+            :VtrSendCommandToRunner! . ../scripts/flexran_repo.env
+        endfunction
 
-    function! BuildTestmacFunc()
-        call AttachToPane(g:pane_for_testmac)
-        :VtrSendCommandToRunner! cd $DIR_WIRELESS/build/lte/testmac
-        :VtrSendCommandToRunner! ../../../../scripts/global_build.sh
-    endfunction
+        function! BuildTestmacFunc(build_exe)
+            call AttachToPane(g:pane_for_testmac)
+            :VtrSendCommandToRunner! cd $DIR_WIRELESS/build/lte/testmac
+            if a:build_exe =~ "testmac"
+                :VtrSendCommandToRunner! export FAPI=false
+            else
+                :VtrSendCommandToRunner! export FAPI=true
+            endif
+            :VtrSendCommandToRunner! ../../../../scripts/global_build.sh
 
-    function! RunTestmacFunc()
-        call AttachToPane(g:pane_for_testmac)
-        :VtrSendCommandToRunner! cd $DIR_WIRELESS/bin/lte/testmac
-        :VtrSendCommandToRunner! ./testmac DIR_WIRELESS_TEST=$DIR_WIRELESS_TEST_4G
-    endfunction
+            "":cfile /workspace/sw/vinodkri/wirelessStack/flexran/npg_wireless-flexran_l1_sw/source/fapi/errorfile
+        endfunction
 
-    function! RunPhyFunc()
-        call AttachToPane(g:pane_for_phy)
-        :VtrSendCommandToRunner! cd $DIR_WIRELESS/bin/lte/l1
-        :VtrSendCommandToRunner! umount /mnt/huge
-        :VtrSendCommandToRunner! ./l1.sh -e
-    endfunction
+        function! RunTestmacFunc()
+            call AttachToPane(g:pane_for_testmac)
+            :VtrSendCommandToRunner! cd $DIR_WIRELESS/bin/lte/testmac
+            :VtrSendCommandToRunner! ./testmac DIR_WIRELESS_TEST=$DIR_WIRELESS_TEST_4G
+        endfunction
 
-    function! BuildPhyFunc()
-        call AttachToPane(g:pane_for_phy)
-        :VtrSendCommandToRunner! cd $DIR_WIRELESS
-        :VtrSendCommandToRunner! cd ferrybridge/lib; make clean; make
-        :VtrSendCommandToRunner! cd ../../ ; cd wls_mod; ./build.sh clean; ./build.sh;
-        :VtrSendCommandToRunner! cd ../../ ; cd wls_libs/mlog/; ./build.sh clean; ./build.sh;
-        :VtrSendCommandToRunner! cd ../../; cd build/lte/l1app; ./build.sh xclean; ./build.sh
-    endfunction
+        function! RunPhyFunc()
+            call AttachToPane(g:pane_for_phy)
+            :VtrSendCommandToRunner! cd $DIR_WIRELESS/bin/lte/l1
+            :VtrSendCommandToRunner! umount /mnt/huge
+            :VtrSendCommandToRunner! ./l1.sh -e
+        endfunction
 
-    function! ExitPhyTestmacFunc()
-        call AttachToPane(g:pane_for_phy)
-        :VtrSendCommandToRunner! exit
-        call AttachToPane(g:pane_for_testmac)
-        :VtrSendCommandToRunner! exit
-    endfunction
+        function! BuildPhyFunc()
+            call AttachToPane(g:pane_for_phy)
+            :VtrSendCommandToRunner! cd $DIR_WIRELESS
+            :VtrSendCommandToRunner! cd ferrybridge/lib; make clean; make
+            :VtrSendCommandToRunner! cd ../../ ; cd wls_mod; ./build.sh clean; ./build.sh;
+            :VtrSendCommandToRunner! cd ../../ ; cd wls_libs/mlog/; ./build.sh clean; ./build.sh;
+            :VtrSendCommandToRunner! cd ../../; cd build/lte/l1app; ./build.sh xclean; ./build.sh
+            let s:session = :!tmux display-message -p '\#{session_name}'
+            let s:win = :!tmux display-message -p '\#{window_index}'
+            execute ':tmux send-keys -t' . s:session . ':' s:win '.' . g:pane_for_phy . 'cat .vimrc' Enter
+            execute ':cexpr system(capture-pane -pS -32768 -t' . s:session . ':' s:win '.' . g:pane_for_phy . '| copen <CR>'
+            ":!tmux capture-pane -t <session:win.pane> 
+            ":cexpr system('tmux capture-pane -pS -32768 -t fapi:2.2') | copen
+        endfunction
 
-    function! RunFDFunc(test_number)
-        call AttachToPane(g:pane_for_testmac)
-        execute ':VtrSendCommandToRunner!'. 'run 2 ' . a:test_number
-    endfunction
+        function! ExitPhyTestmacFunc()
+            call AttachToPane(g:pane_for_phy)
+            :VtrSendCommandToRunner! exit
+            call AttachToPane(g:pane_for_testmac)
+            :VtrSendCommandToRunner! exit
+        endfunction
 
-    function! RunULFunc(test_number)
-        call AttachToPane(g:pane_for_testmac)
-        execute ':VtrSendCommandToRunner!'. 'run 1 ' . a:test_number
-    endfunction
+        function! RunFDFunc(test_number)
+            call AttachToPane(g:pane_for_testmac)
+            execute ':VtrSendCommandToRunner!'. 'run 2 ' . a:test_number
+        endfunction
 
-    function! RunDLFunc(test_number)
-        call AttachToPane(g:pane_for_testmac)
-        execute ':VtrSendCommandToRunner!'. 'run 0 ' . a:test_number
-    endfunction
+        function! RunULFunc(test_number)
+            call AttachToPane(g:pane_for_testmac)
+            execute ':VtrSendCommandToRunner!'. 'run 1 ' . a:test_number
+        endfunction
 
-    command! -bang -nargs=? InitTestmac call g:InitTestmacFunc(<f-args>)
-    command! -bang -nargs=? InitPhy call g:InitPhyFunc(<f-args>)
-    command! RunPhy call g:RunPhyFunc()
-    command! RunTestmac call g:RunTestmacFunc()
-    command! BuildTestmac call g:BuildTestmacFunc()
-    command! BuildPhy call g:BuildPhyFunc()
-    command! ExitApp call g:ExitPhyTestmacFunc()
-    command! -bang -nargs=? RunFD call g:RunFDFunc(<f-args>)
-    command! -bang -nargs=? RunUL call g:RunULFunc(<f-args>)
-    command! -bang -nargs=? RunDL call g:RunDLFunc(<f-args>)
+        function! RunDLFunc(test_number)
+            call AttachToPane(g:pane_for_testmac)
+            execute ':VtrSendCommandToRunner!'. 'run 0 ' . a:test_number
+        endfunction
 
-    map <F5> :BuildTestmac<CR>
-    map <F6> :RunTestmac <CR>
-    map <F7> :BuildPhy<CR>
-    map <F8> :RunPhy<CR>
-    map <F9> :ExitApp<CR>
+        function! RunTestmacFDHighPrioityFunc()
+            call AttachToPane(g:pane_for_testmac)
+            :VtrSendCommandToRunner! rm Results.txt
+            :VtrSendCommandToRunner! cd $DIR_WIRELESS/bin/lte/testmac
+            :VtrSendCommandToRunner! ./testmac DIR_WIRELESS_TEST=$DIR_WIRELESS_TEST_4G --testfile=fd_regression_high_prio.cfg
+        endfunction
+        
+        function! RunTestmacULRegression()
+            call AttachToPane(g:pane_for_testmac)
+            :VtrSendCommandToRunner! cd $DIR_WIRELESS/bin/lte/testmac
+            :VtrSendCommandToRunner! rm Results.txt
+            :VtrSendCommandToRunner! ./testmac DIR_WIRELESS_TEST=$DIR_WIRELESS_TEST_4G --testfile=ul_tests.cfg
+        endfunction
 
+        function! RunTestmacDLRegression()
+            call AttachToPane(g:pane_for_testmac)
+            :VtrSendCommandToRunner! cd $DIR_WIRELESS/bin/lte/testmac
+            :VtrSendCommandToRunner! rm Results.txt
+            :VtrSendCommandToRunner! ./testmac DIR_WIRELESS_TEST=$DIR_WIRELESS_TEST_4G --testfile=dl_tests.cfg
+        endfunction
+        """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" 
+        " Experimental
+        """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" 
+        function! s:Strip(string)
+            return substitute(a:string, '^\s*\(.\{-}\)\s*\n\?$', '\1', '')
+        endfunction
+
+        function! TmuxSessionName()
+            let l:session = get(g:, 'tmux_session', '')
+            echo l:session
+            "return s:Strip(system("tmux display-message -p '#{session_name}'"))
+        endfunction
+        
+        function! TmuxActiveWindow()
+            return str2nr(s:Strip(system("tmux display-message -p '#{window_index}'")))
+        endfunction
+
+        function! DummyTest()
+            let s:session = TmuxSessionName()
+            let s:win = TmuxActiveWindow()
+            echo s:session
+            echo s:win
+            execute '":!tmux send-keys -t " . s:session.":".s:win.".".g:pane_for_testmac . " cat .vimrc "'
+            let s:cmd = ""
+            redir => s:cmd
+            execute '"tmux capture-pane -pS -32768 -t ".s:session.":"s:win.".".g:pane_for_testmac'
+            redir END
+            echo s:cmd
+            let s:output = system(s:Strip(s:cmd))
+            execute ':cexpr s:output | copen <CR>'
+        endfunction
+        """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" 
+        command! -bang -nargs=? InitTestmac call g:InitTestmacFunc(<f-args>)
+        command! -bang -nargs=? InitPhy call g:InitPhyFunc(<f-args>)
+        command! RunPhy call g:RunPhyFunc()
+        command! RunTestmac call g:RunTestmacFunc()
+        command! RunFDHighPrioity call g:RunTestmacFDHighPrioityFunc()
+        command! RunDLRegress call g:RunTestmacDLRegression()
+        command! RunULRegress call g:RunTestmacULRegression()
+        command! -bang -nargs=? BuildTestmac call g:BuildTestmacFunc(<f-args>)
+        "command! BuildTestmac call g:BuildTestmacFunc()
+        command! BuildPhy call g:BuildPhyFunc()
+        command! ExitApp call g:ExitPhyTestmacFunc()
+        command! -bang -nargs=? RunFD call g:RunFDFunc(<f-args>)
+        command! -bang -nargs=? RunUL call g:RunULFunc(<f-args>)
+        command! -bang -nargs=? RunDL call g:RunDLFunc(<f-args>)
+
+        map <F5> :BuildTestmac<CR>
+        map <F6> :RunTestmac<CR>
+        map <F7> :BuildPhy<CR>
+        map <F8> :RunPhy<CR>
+        map <F9> :ExitApp<CR>
     "}}}2
 "}}}1
 
