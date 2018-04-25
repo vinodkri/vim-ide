@@ -52,6 +52,8 @@ Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'edkolev/tmuxline.vim'
 
+"Plugin 'christoomey/vim-tmux-runner'
+Plugin 'vinodkri/vim-tmux-runner'
 call vundle#end()
 "}}}1
 
@@ -402,7 +404,7 @@ call vundle#end()
     syntax enable
     set syntax=on
 
-    " set t_ut=
+    set t_ut=
     " Send more characters for redraws
     set ttyfast
     set nocompatible
@@ -436,8 +438,11 @@ call vundle#end()
     set laststatus=2
     set foldenable
 
+    set nomagic
+
     set backspace=indent,eol,start
     highlight Search ctermbg=darkmagenta ctermfg=white
+    highlight IncSearch cterm=underline,bold  ctermbg=darkgreen ctermfg=black
     highlight VertSplit ctermbg=darkgreen ctermfg=darkgrey
     autocmd FileType * setlocal foldmethod=manual
 
@@ -534,7 +539,7 @@ call vundle#end()
 "}}}1
 
 "Leader Key Bindings {{{1
-    let mapleader = ","
+    let mapleader = ";"
     let maplocalleader = "\\"
 
     " Disable highlight when <leader><cr> is pressed
@@ -559,14 +564,14 @@ call vundle#end()
         noremap 9` 9<C-W>w
 
         " Window resizing mappings
-        nnoremap <S-Up> :normal <c-r>=Resize('+')<CR><CR>
-        nnoremap <S-Down> :normal <c-r>=Resize('-')<CR><CR>
-        nnoremap <S-Left> :normal <c-r>=Resize('<')<CR><CR>
-        nnoremap <S-Right> :normal <c-r>=Resize('>')<CR><CR>
-        map <silent> <S-Right> <C-w><
-        map <silent> <S-Down> <C-W>-
-        map <silent> <S-Up> <C-W>+
-        map <silent> <S-Left> <C-w>>
+        "nnoremap <S-Up> :normal <c-r>=Resize('+')<CR><CR>
+        "nnoremap <S-Down> :normal <c-r>=Resize('-')<CR><CR>
+        "nnoremap <S-Left> :normal <c-r>=Resize('<')<CR><CR>
+        "nnoremap <S-Right> :normal <c-r>=Resize('>')<CR><CR>
+        nnoremap <silent> <C-Right> <C-w><
+        nnoremap <silent> <C-Down> <C-W>-
+        nnoremap <silent> <C-Up> <C-W>+
+        nnoremap <silent> <C-Left> <C-w>>
     "}}}2
 
     "Cscope & Tag Settings {{{2
@@ -595,15 +600,6 @@ call vundle#end()
         "7 or f: Find this file
         "8 or i: Find files #including this file
 
-        noremap<leader>s "zyiw:exe "tab cs find 0 ".@z.""<CR>
-        noremap<leader>g "zyiw:exe "tab cs find 1 ".@z.""<CR>
-        noremap<leader>d "zyiw:exe "tab cs find 2 ".@z.""<CR>
-        noremap<leader>c "zyiw:exe "tab cs find 3 ".@z.""<CR>
-        noremap<leader>t "zyiw:exe "tab cs find 4 ".@z.""<CR>
-        noremap<leader>e "zyiw:exe "tab cs find 6 ".@z.""<CR>
-        noremap<leader>f "zyiw:exe "tab cs find 7 ".@z.""<CR>
-        noremap<leader>i "zyiw:exe "tab cs find 8 ".@z.""<CR>
-
         noremap<localleader>s "zyiw:exe "tab cs find 0 ".@z.""<CR>
         noremap<localleader>g "zyiw:exe "tab cs find 1 ".@z.""<CR>
         noremap<localleader>d "zyiw:exe "tab cs find 2 ".@z.""<CR>
@@ -612,28 +608,37 @@ call vundle#end()
         noremap<localleader>e "zyiw:exe "tab cs find 6 ".@z.""<CR>
         noremap<localleader>f "zyiw:exe "tab cs find 7 ".@z.""<CR>
         noremap<localleader>i "zyiw:exe "tab cs find 8 ".@z.""<CR>
+
+        "noremap<locallocalleader>s "zyiw:exe "tab cs find 0 ".@z.""<CR>
+        "noremap<locallocalleader>g "zyiw:exe "tab cs find 1 ".@z.""<CR>
+        "noremap<locallocalleader>d "zyiw:exe "tab cs find 2 ".@z.""<CR>
+        "noremap<locallocalleader>c "zyiw:exe "tab cs find 3 ".@z.""<CR>
+        "noremap<locallocalleader>t "zyiw:exe "tab cs find 4 ".@z.""<CR>
+        "noremap<locallocalleader>e "zyiw:exe "tab cs find 6 ".@z.""<CR>
+        "noremap<locallocalleader>f "zyiw:exe "tab cs find 7 ".@z.""<CR>
+        "noremap<locallocalleader>i "zyiw:exe "tab cs find 8 ".@z.""<CR>
         " Using ',hcX' searches current word and makes the vim
         " window split horizontally, with search result displayed
         " in the new window.
-        noremap<leader>hs "zyiw:exe "scs find 0 ".@z.""<CR>
-        noremap<leader>hg "zyiw:exe "scs find 1 ".@z.""<CR>
-        noremap<leader>hd "zyiw:exe "scs find 2 ".@z.""<CR>
-        noremap<leader>hc "zyiw:exe "scs find 3 ".@z.""<CR>
-        noremap<leader>ht "zyiw:exe "scs find 4 ".@z.""<CR>
-        noremap<leader>he "zyiw:exe "scs find 6 ".@z.""<CR>
-        noremap<leader>hf "zyiw:exe "scs find 7 ".@z.""<CR>
-        noremap<leader>hi "zyiw:exe "scs find 8 ".@z.""<CR>
+        noremap<localleader>hs "zyiw:exe "scs find 0 ".@z.""<CR>
+        noremap<localleader>hg "zyiw:exe "scs find 1 ".@z.""<CR>
+        noremap<localleader>hd "zyiw:exe "scs find 2 ".@z.""<CR>
+        noremap<localleader>hc "zyiw:exe "scs find 3 ".@z.""<CR>
+        noremap<localleader>ht "zyiw:exe "scs find 4 ".@z.""<CR>
+        noremap<localleader>he "zyiw:exe "scs find 6 ".@z.""<CR>
+        noremap<localleader>hf "zyiw:exe "scs find 7 ".@z.""<CR>
+        noremap<localleader>hi "zyiw:exe "scs find 8 ".@z.""<CR>
 
         " Hitting ',vcsX' searches current word and does a vertical
         " split instead of a horizontal one
-        noremap<leader>vs "zyiw:exe "vert scs find 0 ".@z.""<CR>
-        noremap<leader>vg "zyiw:exe "vert scs find 1 ".@z.""<CR>
-        noremap<leader>vd "zyiw:exe "vert scs find 2 ".@z.""<CR>
-        noremap<leader>vc "zyiw:exe "vert scs find 3 ".@z.""<CR>
-        noremap<leader>vt "zyiw:exe "vert scs find 4 ".@z.""<CR>
-        noremap<leader>ve "zyiw:exe "vert scs find 6 ".@z.""<CR>
-        noremap<leader>vf "zyiw:exe "vert scs find 7 ".@z.""<CR>
-        noremap<leader>vi "zyiw:exe "vert scs find 8 ".@z.""<CR>
+        noremap<localleader>vs "zyiw:exe "vert scs find 0 ".@z.""<CR>
+        noremap<localleader>vg "zyiw:exe "vert scs find 1 ".@z.""<CR>
+        noremap<localleader>vd "zyiw:exe "vert scs find 2 ".@z.""<CR>
+        noremap<localleader>vc "zyiw:exe "vert scs find 3 ".@z.""<CR>
+        noremap<localleader>vt "zyiw:exe "vert scs find 4 ".@z.""<CR>
+        noremap<localleader>ve "zyiw:exe "vert scs find 6 ".@z.""<CR>
+        noremap<localleader>vf "zyiw:exe "vert scs find 7 ".@z.""<CR>
+        noremap<localleader>vi "zyiw:exe "vert scs find 8 ".@z.""<CR>
 
         "Cscope shortcuts
         " f: Find this file
