@@ -424,7 +424,7 @@ call vundle#end()
     set t_ut=
     " Send more characters for redraws
     set ttyfast
-    set lazyredraw
+    "set lazyredraw
 
     " Set this to the name of your terminal that supports mouse codes.
     " Must be one of: xterm, xterm2, netterm, dec, jsbterm, pterm
@@ -715,7 +715,7 @@ call vundle#end()
         endif
 
         function! InitTestmacFunc(build_server)
-            call AttachToPane(g:pane_for_testmac)
+            execute ':VtrAttachToPane!' . g:pane_for_testmac
             execute ':VtrSendCommandToRunner!' . 'ssh cwd'. a:build_server
             :VtrSendCommandToRunner! cd /workspace/sw/vinodkri/wirelessStack/flexran/npg_wireless-flexran_l1_sw
             :VtrSendCommandToRunner! . ../scripts/flexran_repo.env
@@ -725,14 +725,14 @@ call vundle#end()
         endfunction
 
         function! InitPhyFunc(build_server)
-            call AttachToPane(g:pane_for_phy)
+            execute ':VtrAttachToPane!' . g:pane_for_phy
             execute ':VtrSendCommandToRunner!' . 'ssh cwd'. a:build_server
             :VtrSendCommandToRunner! cd /workspace/sw/vinodkri/wirelessStack/flexran/npg_wireless-flexran_l1_sw
             :VtrSendCommandToRunner! . ../scripts/flexran_repo.env
         endfunction
 
         function! BuildTestmacFunc(build_exe)
-            call AttachToPane(g:pane_for_testmac)
+            execute ':VtrAttachToPane!' . g:pane_for_testmac
             :VtrSendCommandToRunner! cd $DIR_WIRELESS/build/lte/testmac
             if a:build_exe =~ "testmac"
                 :VtrSendCommandToRunner! export FAPI=false
@@ -745,20 +745,20 @@ call vundle#end()
         endfunction
 
         function! RunTestmacFunc()
-            call AttachToPane(g:pane_for_testmac)
+            execute ':VtrAttachToPane!' . g:pane_for_testmac
             :VtrSendCommandToRunner! cd $DIR_WIRELESS/bin/lte/testmac
             :VtrSendCommandToRunner! ./testmac DIR_WIRELESS_TEST=$DIR_WIRELESS_TEST_4G
         endfunction
 
         function! RunPhyFunc()
-            call AttachToPane(g:pane_for_phy)
+            execute ':VtrAttachToPane!' . g:pane_for_phy
             :VtrSendCommandToRunner! cd $DIR_WIRELESS/bin/lte/l1
             :VtrSendCommandToRunner! umount /mnt/huge
             :VtrSendCommandToRunner! ./l1.sh -e
         endfunction
 
         function! BuildPhyFunc()
-            call AttachToPane(g:pane_for_phy)
+            execute ':VtrAttachToPane!' . g:pane_for_phy
             :VtrSendCommandToRunner! cd $DIR_WIRELESS
             :VtrSendCommandToRunner! cd ferrybridge/lib; make clean; make
             :VtrSendCommandToRunner! cd ../../ ; cd wls_mod; ./build.sh clean; ./build.sh;
@@ -766,50 +766,50 @@ call vundle#end()
             :VtrSendCommandToRunner! cd ../../; cd build/lte/l1app; ./build.sh xclean; ./build.sh
             let s:session = :!tmux display-message -p '\#{session_name}'
             let s:win = :!tmux display-message -p '\#{window_index}'
-            execute ':tmux send-keys -t' . s:session . ':' s:win '.' . g:pane_for_phy . 'cat .vimrc' Enter
+            execute ':tmux send-keys -t' . s:session . ':' s:win '.' . g:pane_for_phy . Enter
             execute ':cexpr system(capture-pane -pS -32768 -t' . s:session . ':' s:win '.' . g:pane_for_phy . '| copen <CR>'
             ":!tmux capture-pane -t <session:win.pane> 
             ":cexpr system('tmux capture-pane -pS -32768 -t fapi:2.2') | copen
         endfunction
 
         function! ExitPhyTestmacFunc()
-            call AttachToPane(g:pane_for_phy)
+            execute ':VtrAttachToPane!' . g:pane_for_phy
             :VtrSendCommandToRunner! exit
-            call AttachToPane(g:pane_for_testmac)
+            execute ':VtrAttachToPane!' . g:pane_for_testmac
             :VtrSendCommandToRunner! exit
         endfunction
 
         function! RunFDFunc(test_number)
-            call AttachToPane(g:pane_for_testmac)
+            execute ':VtrAttachToPane!' . g:pane_for_testmac
             execute ':VtrSendCommandToRunner!'. 'run 2 ' . a:test_number
         endfunction
 
         function! RunULFunc(test_number)
-            call AttachToPane(g:pane_for_testmac)
+            execute ':VtrAttachToPane!' . g:pane_for_testmac
             execute ':VtrSendCommandToRunner!'. 'run 1 ' . a:test_number
         endfunction
 
         function! RunDLFunc(test_number)
-            call AttachToPane(g:pane_for_testmac)
+            execute ':VtrAttachToPane!' . g:pane_for_testmac
             execute ':VtrSendCommandToRunner!'. 'run 0 ' . a:test_number
         endfunction
 
         function! RunTestmacFDHighPrioityFunc()
-            call AttachToPane(g:pane_for_testmac)
+            execute ':VtrAttachToPane!' . g:pane_for_testmac
             :VtrSendCommandToRunner! rm Results.txt
             :VtrSendCommandToRunner! cd $DIR_WIRELESS/bin/lte/testmac
             :VtrSendCommandToRunner! ./testmac DIR_WIRELESS_TEST=$DIR_WIRELESS_TEST_4G --testfile=fd_regression_high_prio.cfg
         endfunction
         
         function! RunTestmacULRegression()
-            call AttachToPane(g:pane_for_testmac)
+            execute ':VtrAttachToPane!' . g:pane_for_testmac
             :VtrSendCommandToRunner! cd $DIR_WIRELESS/bin/lte/testmac
             :VtrSendCommandToRunner! rm Results.txt
             :VtrSendCommandToRunner! ./testmac DIR_WIRELESS_TEST=$DIR_WIRELESS_TEST_4G --testfile=ul_tests.cfg
         endfunction
 
         function! RunTestmacDLRegression()
-            call AttachToPane(g:pane_for_testmac)
+            execute ':VtrAttachToPane!' . g:pane_for_testmac
             :VtrSendCommandToRunner! cd $DIR_WIRELESS/bin/lte/testmac
             :VtrSendCommandToRunner! rm Results.txt
             :VtrSendCommandToRunner! ./testmac DIR_WIRELESS_TEST=$DIR_WIRELESS_TEST_4G --testfile=dl_tests.cfg
@@ -845,6 +845,7 @@ call vundle#end()
             let s:output = system(s:Strip(s:cmd))
             execute ':cexpr s:output | copen <CR>'
         endfunction
+
         """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" 
         command! -bang -nargs=? InitTestmac call g:InitTestmacFunc(<f-args>)
         command! -bang -nargs=? InitPhy call g:InitPhyFunc(<f-args>)
