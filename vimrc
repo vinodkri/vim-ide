@@ -527,6 +527,7 @@ call vundle#end()
     cnoreabbrev <expr> Wa ((getcmdtype() is# ':' && getcmdline() is# 'Wa')?('wa'):('Wa'))
     cnoreabbrev <expr> Qa ((getcmdtype() is# ':' && getcmdline() is# 'Qa')?('qa'):('Qa'))
     cnoreabbrev <expr> Q ((getcmdtype() is# ':' && getcmdline() is# 'Q')?('q'):('Q'))
+    command Grep !grep --line-buffered --color=never -r "" * | fzf
     "Function Key's Toggling! {{{2
     "--------------------------------------------------------------------------
     nnoremap <F6> :call QuickfixToggle()<cr>
@@ -564,14 +565,15 @@ call vundle#end()
         noremap 9` 9<C-W>w
 
         " Window resizing mappings
-        "nnoremap <S-Up> :normal <c-r>=Resize('+')<CR><CR>
-        "nnoremap <S-Down> :normal <c-r>=Resize('-')<CR><CR>
-        "nnoremap <S-Left> :normal <c-r>=Resize('<')<CR><CR>
-        "nnoremap <S-Right> :normal <c-r>=Resize('>')<CR><CR>
-        nnoremap <silent> <C-Right> <C-w><
-        nnoremap <silent> <C-Down> <C-W>-
-        nnoremap <silent> <C-Up> <C-W>+
-        nnoremap <silent> <C-Left> <C-w>>
+        nnoremap <C-k>  <C-w>+
+        nnoremap <C-j>  <C-w>-
+        nnoremap <C-h>  <C-w><
+        nnoremap <C-l> <C-w>>
+    "}}}2
+
+    " Search and Replace like a boss {{{2
+        nnoremap <leader-r> :%s///gc<Left><Left><Left>
+        nnoremap <leader-rw> :%s/<C-r><C-w>//gc<Left><Left><Left>
     "}}}2
 
     "Cscope & Tag Settings {{{2
@@ -689,4 +691,21 @@ call vundle#end()
 	    " Super useful when editing files in the same directory
 	    noremap<leader>te :tabedit <c-r>=expand("%:p:h")<cr>/
 	"}}}2
+"}}}1
+
+"Autocmd Configs {{{1
+function VimFileSettings()
+    setlocal foldmethod=marker
+    setlocal foldlevel=1
+    setlocal foldminlines=6
+    setlocal foldenable
+    :highlight Folded ctermbg=darkgrey ctermfg=white
+endfunction
+
+autocmd Filetype vim call VimFileSettings()
+" Return to last edit position when opening files (You want this!)
+autocmd BufReadPost *
+            \ if line("'\"") > 0 && line("'\"") <= line("$") |
+            \   exe "normal! g`\"" |
+            \ endif
 "}}}1
