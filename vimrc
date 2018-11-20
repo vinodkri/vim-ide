@@ -47,7 +47,13 @@ Plugin 'scrooloose/nerdcommenter'
 Plugin 'raimondi/delimitmate'
 "Enable yanking and pasting text between vim buffers across panes/windows
 Plugin 'gsiano/vmux-clipboard'
+"Auto Tagging
+"Plugin 'craigemery/vim-autotag'
 
+"Restore FocusGained and FocusLost events
+Plugin 'tmux-plugins/vim-tmux-focus-events'
+
+"Theme
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'edkolev/tmuxline.vim'
@@ -77,20 +83,20 @@ call vundle#end()
         let g:fzf_layout = { 'down': '~40%' }
 
         " Customize fzf colors to match your color scheme
-        "let g:fzf_colors =
-        "\ { 'fg':      ['fg', 'Normal'],
-        "  \ 'bg':      ['bg', 'Normal'],
-        "  \ 'hl':      ['fg', 'Comment'],
-        "  \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
-        "  \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
-        "  \ 'hl+':     ['fg', 'Statement'],
-        "  \ 'info':    ['fg', 'PreProc'],
-        "  \ 'border':  ['fg', 'Ignore'],
-        "  \ 'prompt':  ['fg', 'Conditional'],
-        "  \ 'pointer': ['fg', 'Exception'],
-        "  \ 'marker':  ['fg', 'Keyword'],
-        "  \ 'spinner': ['fg', 'Label'],
-        "  \ 'header':  ['fg', 'Comment'] }
+        let g:fzf_colors =
+        \ { 'fg':      ['fg', 'Normal'],
+          \ 'bg':      ['bg', 'Normal'],
+          \ 'hl':      ['fg', 'Comment'],
+          \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+          \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+          \ 'hl+':     ['fg', 'Statement'],
+          \ 'info':    ['fg', 'PreProc'],
+          \ 'border':  ['fg', 'Ignore'],
+          \ 'prompt':  ['fg', 'Conditional'],
+          \ 'pointer': ['fg', 'Exception'],
+          \ 'marker':  ['fg', 'Keyword'],
+          \ 'spinner': ['fg', 'Label'],
+          \ 'header':  ['fg', 'Comment'] }
 
         " Enable per-command history.
         " CTRL-N and CTRL-P will be automatically bound to next-history and
@@ -236,8 +242,8 @@ call vundle#end()
             nmap <C-f>s  :Snippets<CR>
 
             " Insert mode completion
-            imap <c-x><c-k> <plug>(fzf-complete-word)
-            imap <c-x><c-f> <plug>(fzf-complete-path)
+            "imap <c-x><c-k> <plug>(fzf-complete-word)
+            "imap <c-x><c-f> <plug>(fzf-complete-path)
             "imap <c-x><c-j> <plug>(fzf-complete-file-ag)
             imap <c-x><c-l> <plug>(fzf-complete-line)
             imap <c-x><c-b> <plug>(fzf-complete-buffer-line)
@@ -399,6 +405,13 @@ call vundle#end()
     "VTR {{{2
         let g:VtrUseVtrMaps = 1
     "}}}2
+
+    "AutoTagging {{{2
+        "let g:autotagStopAt='../'
+        let g:autotagDisabled='enable'
+        let g:autotagTagsFile="tags"
+        let g:autotagCtagsCmd='ctags -a'
+    "}}}2
 "}}}1
 
 " Default settings for vim {{{1
@@ -413,9 +426,9 @@ call vundle#end()
     "endif
 
     if &diff
-        colorscheme elflord 
+        colorscheme murphy
     else
-        colorscheme desert
+        colorscheme murphy
     endif
 
     syntax enable
@@ -431,6 +444,7 @@ call vundle#end()
     set ttymouse=xterm2
 
     set wildmenu
+    set wildmode=list:longest
     " To Remember
     " z. [z followed by a dot (.)] - to put the line with the cursor at the
     " center,
@@ -452,24 +466,18 @@ call vundle#end()
     set relativenumber "Show line numbers
     set laststatus=2
 
-    set nomagic
-
-    set backspace=indent,eol,start
-    highlight Search ctermbg=darkmagenta ctermfg=white
-    highlight IncSearch cterm=underline,bold  ctermbg=darkgreen ctermfg=black
-    highlight VertSplit ctermbg=darkgreen ctermfg=darkgrey
+    "set nomagic
+    "highlight Search ctermbg=darkmagenta ctermfg=white
+    highlight Search ctermbg=green ctermfg=black
+    highlight IncSearch cterm=underline,bold  ctermbg=brown ctermfg=white
+    highlight VertSplit ctermbg=darkgreen ctermfg=black
+    "highlight VertSplit ctermbg=black ctermfg=darkred
 
     set foldenable
     setlocal foldmethod=syntax
     setlocal foldlevel=4
-
-    let @a = 'vi{:!column -tgv='
-    let @s ='gv:!column -tgv='
-    let @f =']]k"Wy$2j@f'
-    let @d ='"wpf)a;@d'
     set cst
     set csto=1
-    set tags=tags
 
     if &diff
     else
@@ -484,7 +492,7 @@ call vundle#end()
     endif
 
     set backspace=2
-    set backspace=indent,eol,start
+    set backspace+=indent,eol,start
     set tabstop=4                   " Number of visual spaces per TAB
     set softtabstop=4               " Number of spaces in tab when editing
     set expandtab                   " Tabs are spaces
@@ -499,14 +507,17 @@ call vundle#end()
     set infercase
     set smartcase
 
+    " Set vim to save the file on focus out.
+    au FocusLost * :wa \| :redraw!
+    "Auto redraw when focus gained
+    au FocusGained * :redraw!
+
     " Vim Auto complete
-    set complete=.,t,w,d,b,u,i,
+    set complete=.,t,w,d,b,u
+    set complete-=i
     set completeopt=menu,longest,preview
     highlight Pmenu ctermbg=darkgreen
     highlight PmenuSel ctermbg=white
-    inoremap <C-n> <C-x><C-n>
-    "inoremap <C-l> <C-x><C-l>
-    inoremap <C-Tab> <C-x><C-o>
     "Loop through pop completion
     inoremap <expr><tab>   pumvisible() ? "\<C-n>" : "\<tab>"
     inoremap <expr><s-tab> pumvisible() ? "\<C-p>" : "\<s-tab>"
@@ -538,7 +549,50 @@ call vundle#end()
     cnoreabbrev <expr> Wa ((getcmdtype() is# ':' && getcmdline() is# 'Wa')?('wa'):('Wa'))
     cnoreabbrev <expr> Qa ((getcmdtype() is# ':' && getcmdline() is# 'Qa')?('qa'):('Qa'))
     cnoreabbrev <expr> Q ((getcmdtype() is# ':' && getcmdline() is# 'Q')?('q'):('Q'))
-    command Grep !grep --line-buffered --color=never -r "" * | fzf
+
+    command VGrep !grep --line-buffered --color=never -r "" * | fzf
+
+    function! SortBetweenBracketsAndIndent()
+        let @x = 'vi{:!column -tgv='
+        normal! @x
+        let @x=''
+    endfunction
+    command! VSortBrackets call SortBetweenBracketsAndIndent()
+
+    function! SortSelectedLinesAndIndent()
+        let @x ='gv:!column -tgv='
+        normal! @x
+        let @x=''
+    endfunction
+    command! VSortLines call SortSelectedLinesAndIndent()
+
+    function! CHeaderDefines()
+        let @x='G"%p0i#ifndef wgUWi_f.s_A_yypldwidefine yypldwiendif // '
+        normal! @x
+        let @x=''
+    endfunction
+    command! VCHeader call CHeaderDefines()
+
+    function! GatherFunctionDefinitions()
+        let @z=''
+        let @x=''
+        wincmd h
+        normal! gg
+        let @x =']]j"Zy((]]2j@x'
+        normal! @x
+        wincmd l
+        normal! "zpGo
+        let @x ='ddkA;'
+        normal! [[
+        while line(".") > 1
+            normal! @x
+            normal! [[
+        endwhile
+        let @z=''
+        let @x=''
+    endfunction
+    command! VFuncDef call GatherFunctionDefinitions()
+
     "Function Key's Toggling! {{{2
     "--------------------------------------------------------------------------
     "nnoremap <F6> :call QuickfixToggle()<cr>
@@ -583,8 +637,12 @@ call vundle#end()
     "}}}2
 
     " Search and Replace like a boss {{{2
-        nnoremap <leader-r> :%s///gc<Left><Left><Left>
-        nnoremap <leader-rw> :%s/<C-r><C-w>//gc<Left><Left><Left>
+        nnoremap // /\v
+        command -nargs=1 S2 :2match search /<args>/
+        command -nargs=1 S3 :3match search /<args>/
+        command -nargs=1 IS2 :match incsearch /<args>/
+        nnoremap <leader>r :%s///gc<Left><Left><Left><Left>
+        nnoremap <leader>rw :%s/<C-r><C-w>//gc<Left><Left><Left>
     "}}}2
 
     "Cscope & Tag Settings {{{2
@@ -592,7 +650,7 @@ call vundle#end()
         set cst
         set csto=1
         set tags=tags
-
+        
         if &diff
         else
             set cscopequickfix=s-,c-,d-,i-,t-,e-,f-
@@ -706,167 +764,8 @@ call vundle#end()
 	"}}}2
 
     "VTR Functions {{{2
-        if !exists('g:pane_for_phy')
-            let g:pane_for_phy = '3'
-        endif
-
-        if !exists('g:pane_for_testmac')
-            let g:pane_for_testmac = '2'
-        endif
-
-        function! InitTestmacFunc(build_server)
-            execute ':VtrAttachToPane!' . g:pane_for_testmac
-            execute ':VtrSendCommandToRunner!' . 'ssh cwd'. a:build_server
-            :VtrSendCommandToRunner! cd /workspace/sw/vinodkri/wirelessStack/flexran/npg_wireless-flexran_l1_sw
-            :VtrSendCommandToRunner! . ../scripts/flexran_repo.env
-            :VtrSendCommandToRunner! . ../scripts/testmac.env
-            :VtrSendCommandToRunner! export RTE_WLS=../../../wls_mod
-            :VtrSendCommandToRunner! export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$RTE_WLS
-        endfunction
-
-        function! InitPhyFunc(build_server)
-            execute ':VtrAttachToPane!' . g:pane_for_phy
-            execute ':VtrSendCommandToRunner!' . 'ssh cwd'. a:build_server
-            :VtrSendCommandToRunner! cd /workspace/sw/vinodkri/wirelessStack/flexran/npg_wireless-flexran_l1_sw
-            :VtrSendCommandToRunner! . ../scripts/flexran_repo.env
-        endfunction
-
-        function! BuildTestmacFunc(build_exe)
-            execute ':VtrAttachToPane!' . g:pane_for_testmac
-            :VtrSendCommandToRunner! cd $DIR_WIRELESS/build/lte/testmac
-            if a:build_exe =~ "testmac"
-                :VtrSendCommandToRunner! export FAPI=false
-            else
-                :VtrSendCommandToRunner! export FAPI=true
-            endif
-            :VtrSendCommandToRunner! ../../../../scripts/global_build.sh
-
-            "":cfile /workspace/sw/vinodkri/wirelessStack/flexran/npg_wireless-flexran_l1_sw/source/fapi/errorfile
-        endfunction
-
-        function! RunTestmacFunc()
-            execute ':VtrAttachToPane!' . g:pane_for_testmac
-            :VtrSendCommandToRunner! cd $DIR_WIRELESS/bin/lte/testmac
-            :VtrSendCommandToRunner! ./testmac DIR_WIRELESS_TEST=$DIR_WIRELESS_TEST_4G
-        endfunction
-
-        function! RunPhyFunc()
-            execute ':VtrAttachToPane!' . g:pane_for_phy
-            :VtrSendCommandToRunner! cd $DIR_WIRELESS/bin/lte/l1
-            :VtrSendCommandToRunner! umount /mnt/huge
-            :VtrSendCommandToRunner! ./l1.sh -e
-        endfunction
-
-        function! BuildPhyFunc()
-            execute ':VtrAttachToPane!' . g:pane_for_phy
-            :VtrSendCommandToRunner! cd $DIR_WIRELESS
-            :VtrSendCommandToRunner! cd ferrybridge/lib; make clean; make
-            :VtrSendCommandToRunner! cd ../../ ; cd wls_mod; ./build.sh clean; ./build.sh;
-            :VtrSendCommandToRunner! cd ../../ ; cd wls_libs/mlog/; ./build.sh clean; ./build.sh;
-            :VtrSendCommandToRunner! cd ../../; cd build/lte/l1app; ./build.sh xclean; ./build.sh
-            let s:session = :!tmux display-message -p '\#{session_name}'
-            let s:win = :!tmux display-message -p '\#{window_index}'
-            execute ':tmux send-keys -t' . s:session . ':' s:win '.' . g:pane_for_phy . Enter
-            execute ':cexpr system(capture-pane -pS -32768 -t' . s:session . ':' s:win '.' . g:pane_for_phy . '| copen <CR>'
-            ":!tmux capture-pane -t <session:win.pane> 
-            ":cexpr system('tmux capture-pane -pS -32768 -t fapi:2.2') | copen
-        endfunction
-
-        function! ExitPhyTestmacFunc()
-            execute ':VtrAttachToPane!' . g:pane_for_phy
-            :VtrSendCommandToRunner! exit
-            execute ':VtrAttachToPane!' . g:pane_for_testmac
-            :VtrSendCommandToRunner! exit
-        endfunction
-
-        function! RunFDFunc(test_number)
-            execute ':VtrAttachToPane!' . g:pane_for_testmac
-            execute ':VtrSendCommandToRunner!'. 'run 2 ' . a:test_number
-        endfunction
-
-        function! RunULFunc(test_number)
-            execute ':VtrAttachToPane!' . g:pane_for_testmac
-            execute ':VtrSendCommandToRunner!'. 'run 1 ' . a:test_number
-        endfunction
-
-        function! RunDLFunc(test_number)
-            execute ':VtrAttachToPane!' . g:pane_for_testmac
-            execute ':VtrSendCommandToRunner!'. 'run 0 ' . a:test_number
-        endfunction
-
-        function! RunTestmacFDHighPrioityFunc()
-            execute ':VtrAttachToPane!' . g:pane_for_testmac
-            :VtrSendCommandToRunner! rm Results.txt
-            :VtrSendCommandToRunner! cd $DIR_WIRELESS/bin/lte/testmac
-            :VtrSendCommandToRunner! ./testmac DIR_WIRELESS_TEST=$DIR_WIRELESS_TEST_4G --testfile=fd_regression_high_prio.cfg
-        endfunction
-        
-        function! RunTestmacULRegression()
-            execute ':VtrAttachToPane!' . g:pane_for_testmac
-            :VtrSendCommandToRunner! cd $DIR_WIRELESS/bin/lte/testmac
-            :VtrSendCommandToRunner! rm Results.txt
-            :VtrSendCommandToRunner! ./testmac DIR_WIRELESS_TEST=$DIR_WIRELESS_TEST_4G --testfile=ul_tests.cfg
-        endfunction
-
-        function! RunTestmacDLRegression()
-            execute ':VtrAttachToPane!' . g:pane_for_testmac
-            :VtrSendCommandToRunner! cd $DIR_WIRELESS/bin/lte/testmac
-            :VtrSendCommandToRunner! rm Results.txt
-            :VtrSendCommandToRunner! ./testmac DIR_WIRELESS_TEST=$DIR_WIRELESS_TEST_4G --testfile=dl_tests.cfg
-        endfunction
-        """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" 
-        " Experimental
-        """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" 
-        function! s:Strip(string)
-            return substitute(a:string, '^\s*\(.\{-}\)\s*\n\?$', '\1', '')
-        endfunction
-
-        function! TmuxSessionName()
-            let l:session = get(g:, 'tmux_session', '')
-            echo l:session
-            "return s:Strip(system("tmux display-message -p '#{session_name}'"))
-        endfunction
-        
-        function! TmuxActiveWindow()
-            return str2nr(s:Strip(system("tmux display-message -p '#{window_index}'")))
-        endfunction
-
-        function! DummyTest()
-            let s:session = TmuxSessionName()
-            let s:win = TmuxActiveWindow()
-            echo s:session
-            echo s:win
-            execute '":!tmux send-keys -t " . s:session.":".s:win.".".g:pane_for_testmac . " cat .vimrc "'
-            let s:cmd = ""
-            redir => s:cmd
-            execute '"tmux capture-pane -pS -32768 -t ".s:session.":"s:win.".".g:pane_for_testmac'
-            redir END
-            echo s:cmd
-            let s:output = system(s:Strip(s:cmd))
-            execute ':cexpr s:output | copen <CR>'
-        endfunction
-
-        """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""" 
-        command! -bang -nargs=? InitTestmac call g:InitTestmacFunc(<f-args>)
-        command! -bang -nargs=? InitPhy call g:InitPhyFunc(<f-args>)
-        command! RunPhy call g:RunPhyFunc()
-        command! RunTestmac call g:RunTestmacFunc()
-        command! RunFDHighPrioity call g:RunTestmacFDHighPrioityFunc()
-        command! RunDLRegress call g:RunTestmacDLRegression()
-        command! RunULRegress call g:RunTestmacULRegression()
-        command! -bang -nargs=? BuildTestmac call g:BuildTestmacFunc(<f-args>)
-        "command! BuildTestmac call g:BuildTestmacFunc()
-        command! BuildPhy call g:BuildPhyFunc()
-        command! ExitApp call g:ExitPhyTestmacFunc()
-        command! -bang -nargs=? RunFD call g:RunFDFunc(<f-args>)
-        command! -bang -nargs=? RunUL call g:RunULFunc(<f-args>)
-        command! -bang -nargs=? RunDL call g:RunDLFunc(<f-args>)
-
-        map <F5> :BuildTestmac<CR>
-        map <F6> :RunTestmac<CR>
-        map <F7> :BuildPhy<CR>
-        map <F8> :RunPhy<CR>
-        map <F9> :ExitApp<CR>
+    :source ~/.vim/flexranVtrFunction.vim
+    :source ~/.vim/adkVtrFunction.vim
     "}}}2
 "}}}1
 
@@ -874,7 +773,7 @@ call vundle#end()
 function VimFileSettings()
     setlocal foldmethod=marker
     setlocal foldlevel=1
-    setlocal foldminlines=6
+    setlocal foldminlines=10
     setlocal foldenable
     :highlight Folded ctermbg=darkgrey ctermfg=white
 endfunction

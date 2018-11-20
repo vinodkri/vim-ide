@@ -1,84 +1,84 @@
-snippet foridx "Description" b
+snippet foridx "for loop with idx as iter, define loop counter" b
 	for (idx = 0; idx < $1; ++idx)
 	{
 		$0
 	}
 endsnippet
 
-snippet for "Description" b
+snippet for "for loop, define iter and loop counter" b
 	for ($1 = 0; $1 < $2; ++$1)
 	{
 		$0
 	}
 endsnippet
 
-snippet forvs "Description" b
+snippet forvs "for loop, paste previour visual selection, define iter and loop count" b
 	for ($1 = 0; $1 < $2; ++$1)
 	{
 		$0${VISUAL}
 	}
 endsnippet
 
-snippet if "Description" b
+snippet if "if, define cond" b
 	if ($1)
 	{
 		$0
 	}
 endsnippet
 
-snippet ifeq "Description" b
+snippet ifeq "if eq cond" b
 	if ($1 == $2)
 	{
 		$0
 	}
 endsnippet
 
-snippet ifneq "Description" b
+snippet ifneq "if not eq cond" b
 	if ($1 != $2)
 	{
 		$0
 	}
 endsnippet
 
-snippet ifnulleq "Description" b
+snippet ifnulleq "if null eq cond" b
 	if (NULL == $1)
 	{
 		$0
 	}
 endsnippet
 
-snippet ifnullneq "Description" b
+snippet ifnullneq "if null not eq cond" b
 	if (NULL != $1)
 	{
 		$0
 	}
 endsnippet
 
-snippet and "Description"
+snippet and "and cond"
 	($1 && $2)
 endsnippet
 
-snippet or "Description"
+snippet or "or cond"
 	($1 || $2)
 endsnippet
 
-snippet lt "Description"
+snippet lt "less than cond"
 	($1 < $2)
 endsnippet
 
-snippet lteq "Description"
+snippet lteq "less than eq cond"
 	($1 <= $2)
 endsnippet
 
-snippet gt "Description"
+snippet gt "greater than cond"
 	($1 > $2)
 endsnippet
 
-snippet gteq "Description"
+snippet gteq "greate than eq cond"
 	($1 >= $2)
 endsnippet
 
-snippet prt "description" b
+snippet print "printf" b
 printf("$1\n"$2);$0
 endsnippet
 
@@ -92,7 +92,7 @@ def complete(t, opts):
 endglobal
 
 snippet fapilog "description" b
-FAPI_LOG($1`!p snip.rv=complete(t[1], ['INFO_LOG', 'DEBUG_LOG', 'ERROR_LOG', 'TRACE_LOG'])`, ("[$2`!p snip.rv=complete(t[2], ['FAPI_INT', 'IA_FAPI', 'FAPI WLS'])`] $3",$4));$0
+FAPI_LOG($1`!p snip.rv=complete(t[1], ['INFO_LOG', 'DEBUG_LOG', 'ERROR_LOG', 'TRACE_LOG'])`, ("[$2`!p snip.rv=complete(t[2], ['FAPI_INT', 'IA_FAPI', 'FAPI WLS', 'FAPI_ULCONFIG', 'FAPI_DLCONFIG', 'FAPI_TX', 'RX_IND', 'FAPI_P5'])`] $3",$4));$0
 endsnippet
 
 
