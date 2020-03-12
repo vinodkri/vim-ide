@@ -26,6 +26,8 @@ Plugin 'junegunn/fzf.vim'
 Plugin 'haya14busa/incsearch.vim'
 "Git help
 Plugin 'tpope/vim-fugitive'
+Plugin 'tpope/vim-unimpaired'
+Plugin 'tpope/vim-repeat'
 Plugin 'airblade/vim-gitgutter'
 "Indent guide lines.
 Plugin 'nathanaelkane/vim-indent-guides'
@@ -47,8 +49,6 @@ Plugin 'scrooloose/nerdcommenter'
 Plugin 'raimondi/delimitmate'
 "Enable yanking and pasting text between vim buffers across panes/windows
 Plugin 'gsiano/vmux-clipboard'
-"Auto Tagging
-"Plugin 'craigemery/vim-autotag'
 
 "Restore FocusGained and FocusLost events
 Plugin 'tmux-plugins/vim-tmux-focus-events'
@@ -58,10 +58,23 @@ Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'edkolev/tmuxline.vim'
 
+" ACK -- fast grep
+Plugin 'mileszs/ack.vim'
+
 "Plugin 'christoomey/vim-tmux-runner'
 Plugin 'vinodkri/vim-tmux-runner'
+
+Plugin 'Valloric/YouCompleteMe'
+"Plugin 'ervandew/supertab'
+
+"Plugin 'fatih/vim-go'
+"Plugin 'rust-lang/rust'
+
+Plugin 'majutsushi/tagbar'
 call vundle#end()
 "}}}1
+
+set encoding=utf-8
 
 " Plugin Specific Configurations {{{1
 	" FZF Plugin --- {{{2
@@ -130,6 +143,7 @@ call vundle#end()
             endfunction
 
             function! s:tags()
+                echom 'Preparing tags'
                 if empty(tagfiles())
                     echohl WarningMsg
                     echom 'Preparing tags'
@@ -231,18 +245,18 @@ call vundle#end()
 
             command! FZFNeigh call s:fzf_neighbouring_files()
 
-            nmap <C-f>f  :Files<CR>
-            nmap <C-f>g :GFiles<CR>
-            nmap <C-f>b  :Buffers<CR>
-            nmap <C-f>w  :Windows<CR>
-            nmap <C-f>l  :Lines<CR>
-            nmap <C-f>bl :BLines<CR>
-            nmap <C-f>t  :Tag<CR>
-            nmap <C-f>bt :BTag<CR>
-            nmap <C-f>s  :Snippets<CR>
+            nmap <space>f  :Files<CR>
+            nmap <space>g  :GFiles<CR>
+            nmap <space>b  :Buffers<CR>
+            nmap <space>w  :Windows<CR>
+            nmap <space>l  :Lines<CR>
+            nmap <space>bl :BLines<CR>
+            nmap <space>t  :Tags<CR>
+            nmap <space>bt :BTags<CR>
+            nmap <space>s  :Snippets<CR>
 
             " Insert mode completion
-            "imap <c-x><c-k> <plug>(fzf-complete-word)
+            inoremap <c-x>t <plug>(fzf-complete-word)
             "imap <c-x><c-f> <plug>(fzf-complete-path)
             "imap <c-x><c-j> <plug>(fzf-complete-file-ag)
             imap <c-x><c-l> <plug>(fzf-complete-line)
@@ -268,10 +282,32 @@ call vundle#end()
         map g# <Plug>(incsearch-nohl-g#)
     "}}}2
 
+	" YouCompleteMe Plugin --- {{{2
+    let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
+    let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
+    let g:ycm_complete_in_comments = 1
+    let g:ycm_seed_identifiers_with_syntax = 1
+    let g:ycm_collect_identifiers_from_comments_and_strings = 1
+    "let g:ycm_key_invoke_completion = '<C-Space>'
+    let g:ycm_key_list_select_completion = ['<Enter']
+    let g:ycm_add_preview_to_completeopt = 1
+    "let g:ycm_autoclose_preview_window_after_insertion = 1
+    let g:ycm_autoclose_preview_window_after_completion = 1
+    let g:ycm_enable_diagnostic_highlighting = 0
+    let g:ycm_warning_symbol = '!'
+
+    ""}}}2
+
+	" SuperTab Plugin --- {{{2
+    "let g:SuperTabDefaultCompletionType = '<c-n>'
+
+    ""}}}2
 	" UltiSnips Plugin --- {{{2
-        let g:UltiSnipsExpandTrigger="<tab>"
-        let g:UltiSnipsJumpForwardTrigger="<c-j>"
+        let g:UltiSnipsExpandTrigger="<Tab>"
+        let g:UltiSnipsJumpForwardTrigger="<c-n>"
         let g:UltiSnipsJumpBackwardTrigger="<c-k>"
+
+        let g:UltiSnipsEditSplit="vertical"
 
         " If you want :UltiSnipsEdit to split your window.
         let g:UltiSnipsEditSplit='vertical'
@@ -283,8 +319,8 @@ call vundle#end()
         let g:UltiSnipsEditSplit = 'context'
 
         " Snippets Path
-        let g:UltiSnipsSnippetsDir= $HOME.'/vim-wow-moments/mycoolsnips'
-        let g:UltiSnipsSnippetDirectories=["UltiSnips", "mycoolsnips"]
+        let g:UltiSnipsSnippetsDir= '~/vim-wow-moments/mycoolsnips'
+        let g:UltiSnipsSnippetDirectories=[".vim/bundle/vim-snippets/UltiSnips", "mycoolsnips"]
 	"}}}2
 
     "Vim Taboo Setting {{{2
@@ -303,8 +339,12 @@ call vundle#end()
         let g:NERDDefaultAlign = 'left'
     "}}}2
 
+    "{{{2 Rusty
+        let g:rustfmt_autosave = 1
+    "}}}2
+
     "Airline Settings {{{2
-        let g:airline_theme='wombat'
+        let g:airline_theme='ayu_dark'
         "Tmux settings
         let g:airline#extensions#tmuxline#enabled = 1
         let g:tmuxline_separators = {
@@ -332,7 +372,7 @@ call vundle#end()
         let g:airline#extensions#tabline#buffers_label = 'BUFFERS'
         let g:airline#extensions#tabline#formatter = 'unique_tail'
         let g:airline#extensions#tabline#show_buffers = 0
-        "let g:airline#extensions#taboo#enabled = 0
+        let g:airline#extensions#taboo#enabled = 1
     "}}}2
 
     "GitGutter Mappings {{{2
@@ -406,29 +446,39 @@ call vundle#end()
         let g:VtrUseVtrMaps = 1
     "}}}2
 
-    "AutoTagging {{{2
-        "let g:autotagStopAt='../'
-        let g:autotagDisabled='enable'
-        let g:autotagTagsFile="tags"
-        let g:autotagCtagsCmd='ctags -a'
+    "AutoTagBar {{{2
+        nmap <F4> :TagbarToggle<CR>
     "}}}2
+    
+    "Indentation {{{2
+        let g:indent_guides_enable_on_vim_startup = 1
+        let g:indent_guides_guide_size = 1
+        let g:indent_guides_start_level = 2
+        let g:indent_guides_auto_colors = 0
+        let g:indent_guides_indent_levels = 6
+        let g:indent_guides_color_change_percent = 10
+        autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  ctermbg=grey
+        autocmd VimEnter,Colorscheme * :hi IndentGuidesEven ctermbg=darkgrey
+        nmap <silent> yig <Plug>IndentGuidesToggle
+    "}}}
+    "vim-cpp-enhanced-highlight {{{2
+        let g:cpp_class_scope_highlight = 1
+        let g:cpp_member_variable_highlight = 1
+        let g:cpp_class_decl_highlight = 1
+        let g:cpp_posix_standard = 1
+    ""}}}2
 "}}}1
 
 " Default settings for vim {{{1
     " Enable filetype plugins
     filetype on
     filetype plugin indent on
-
-    "if &diff
-    ""    set background=light
-    "else
+    set nopaste
     set background=dark
-    "endif
-
     if &diff
-        colorscheme murphy
+        colorscheme zellner 
     else
-        colorscheme murphy
+        colorscheme desert
     endif
 
     syntax enable
@@ -443,6 +493,7 @@ call vundle#end()
     " Must be one of: xterm, xterm2, netterm, dec, jsbterm, pterm
     set ttymouse=xterm2
 
+    set path=$PWD/**
     set wildmenu
     set wildmode=list:longest
     " To Remember
@@ -467,29 +518,18 @@ call vundle#end()
     set laststatus=2
 
     "set nomagic
-    "highlight Search ctermbg=darkmagenta ctermfg=white
-    highlight Search ctermbg=green ctermfg=black
-    highlight IncSearch cterm=underline,bold  ctermbg=brown ctermfg=white
+    "highlight Search ctermbg=darkmagenta ctermfg=black
+    highlight Search ctermbg=darkgreen ctermfg=black
+    "highlight IncSearch cterm=underline,bold  ctermbg=white ctermfg=black
+    highlight IncSearch cterm=underline,bold  ctermbg=darkgreen ctermfg=black
     highlight VertSplit ctermbg=darkgreen ctermfg=black
-    "highlight VertSplit ctermbg=black ctermfg=darkred
+    highlight VertSplit ctermbg=black ctermfg=darkgreen
+    "highlight MatchParen cterm=bold ctermfg=white ctermbg=lightgrey
 
     set foldenable
     setlocal foldmethod=syntax
+    setlocal foldminlines=10
     setlocal foldlevel=4
-    set cst
-    set csto=1
-
-    if &diff
-    else
-        set cscopequickfix=s-,c-,d-,i-,t-,e-,f-
-    endif
-    if filereadable("cscope.out")
-        cs add cscope.out
-    endif
-
-    if filereadable("my_proj.vim")
-        source my_proj.vim
-    endif
 
     set backspace=2
     set backspace+=indent,eol,start
@@ -501,9 +541,8 @@ call vundle#end()
     set wrap                        " Wrap lines
     "set scrolloff=25                "Make search results appear in the middle of the screen
     set autoindent
-    set cindent
-    set smartindent
-    set textwidth=80
+    "set cindent
+    "set smartindent
     set infercase
     set smartcase
 
@@ -514,31 +553,49 @@ call vundle#end()
 
     " Vim Auto complete
     set complete=.,t,w,d,b,u
-    set complete-=i
+    "set complete-=i
     set completeopt=menu,longest,preview
     highlight Pmenu ctermbg=darkgreen
-    highlight PmenuSel ctermbg=white
+    highlight PmenuSel ctermbg=yellow
     "Loop through pop completion
-    inoremap <expr><tab>   pumvisible() ? "\<C-n>" : "\<tab>"
-    inoremap <expr><s-tab> pumvisible() ? "\<C-p>" : "\<s-tab>"
-    inoremap <expr> j pumvisible() ? "\<C-n>" : "j"
-    inoremap <expr> k pumvisible() ? "\<C-p>" : "k"
+    "inoremap <expr><tab>   pumvisible() ? \"\<c-n>" : \"\<tab>"
+    "inoremap <expr><s-tab> pumvisible() ? \"\<c-p>" : \"\<s-tab>"
+    "inoremap <expr> j pumvisible() ? \"\<c-n>" : \"j"
+    "inoremap <expr> k pumvisible() ? \"\<c-p>" : \"k"
     " Vim Quick Fix movement
-    nnoremap <C-n> :cn<CR>
-    nnoremap <C-b> :cp<CR>
+    nnoremap gn :cn<CR>
+    nnoremap gp :cp<CR>
+    nnoremap * g*
+    nnoremap # g#
     " Close Preview winodow that open along with omnicomplete
     autocmd CompleteDone * pclose
     "Moving around command line
-    cnoremap <C-a> <Home>
-    cnoremap <C-f> <S-Right>
-    cnoremap <C-b> <S-Left>
+    cnoremap <c-a> <Home>
+    cnoremap <c-f> <S-Right>
+    cnoremap <c-b> <S-Left>
+    cnoremap <c-e> <End>
+    inoremap <c-a> <c-o>^
+    inoremap <c-a><c-a> <c-o>0
+    inoremap <c-e> <c-o>$
+
     "My Quirky Hacks
-    map <ScrollWheelUp> <C-y>
-    map <ScrollWheelDown> <C-e>
+    " Tag- Use backspace to jump back {{{2
+    nmap <bs> <C-t>
+    nmap <cr> <c-]>
+    nmap <C-n> :cn<CR>
+    nmap <C-p> :cp<CR>
+    map <ScrollWheelUp> <c-y>
+    map <ScrollWheelDown> <c-e>
+    noremap [{ [{zz
+    noremap [[ [[zz
+    noremap ]] ]]zz
+    noremap %  %zz
     noremap xn a<space><esc>
     noremap xp i<space><esc>
+    noremap <space> <c-d>
+    noremap <s-space> <c-u>
     noremap Y  y$
-    noremap up :s/\<./\u&/g<CR> & :noh<cr>
+    noremap gup :s/\<./\u&/g<CR> & :noh<CR>
     noremap <C-@> i<C-@>
     " Remember info about open buffers on close
     set viminfo^=%
@@ -550,28 +607,28 @@ call vundle#end()
     cnoreabbrev <expr> Qa ((getcmdtype() is# ':' && getcmdline() is# 'Qa')?('qa'):('Qa'))
     cnoreabbrev <expr> Q ((getcmdtype() is# ':' && getcmdline() is# 'Q')?('q'):('Q'))
 
-    command VGrep !grep --line-buffered --color=never -r "" * | fzf
+    command VKGrep !grep --line-buffered --color=never -r "" * | fzf
 
     function! SortBetweenBracketsAndIndent()
         let @x = 'vi{:!column -tgv='
         normal! @x
         let @x=''
     endfunction
-    command! VSortBrackets call SortBetweenBracketsAndIndent()
+    command! VKSortBrackets call SortBetweenBracketsAndIndent()
 
     function! SortSelectedLinesAndIndent()
         let @x ='gv:!column -tgv='
         normal! @x
         let @x=''
     endfunction
-    command! VSortLines call SortSelectedLinesAndIndent()
+    command! VKSortLines call SortSelectedLinesAndIndent()
 
     function! CHeaderDefines()
         let @x='G"%p0i#ifndef wgUWi_f.s_A_yypldwidefine yypldwiendif // '
         normal! @x
         let @x=''
     endfunction
-    command! VCHeader call CHeaderDefines()
+    command! VKCHeader call CHeaderDefines()
 
     function! GatherFunctionDefinitions()
         let @z=''
@@ -591,16 +648,37 @@ call vundle#end()
         let @z=''
         let @x=''
     endfunction
-    command! VFuncDef call GatherFunctionDefinitions()
+    command! VKFuncDef call GatherFunctionDefinitions()
+
+    command! VKWipeReg for i in range(34,122) | silent! call setreg(nr2char(i), []) | endfor
+
+    function! ConvertEnum2Switch()
+        let @x ='gv:!column -tgv='
+        normal! @x
+        let @x=''
+    endfunction
+    command! VKEnum2Switch call ConvertEnum2Switch()
+
+    function! ConvertHashDefine2Switch()
+        let @x=''
+        let @y=''
+        let @y ='02dwicase €ýaea: break;D€ýa' 
+        let @x ='gv:g/define/norm!@ygv='
+        normal! @x
+        let @x=''
+        let @y=''
+    endfunction
+    command! VKHashDefine2Switch call ConvertHashDefine2Switch()
 
     "Function Key's Toggling! {{{2
     "--------------------------------------------------------------------------
     "nnoremap <F6> :call QuickfixToggle()<cr>
-    "map <F5> :!cscope -Rb <CR> & :ctags -R<CR> & :cs reset<CR><CR>
     "set 2 window scroll
     map <F1> :set scb!<CR>
     map <F2> :GitGutterLineHighlightsToggle<CR>
     map <F3> :buffers<CR>:buffer<Space>
+    nmap <F10> :!source ./.git/hooks/ide<CR>:silent cscope add ./.git/hooks/cscope.out<CR><CR>:silent cscope reset<CR><CR>
+    autocmd BufWritePost c,cpp :!source ./.git/hooks/ide<CR>:silent cscope add ./.git/hooks/cscope.out<CR><CR>:silent cscope reset<CR><CR>
     "}}}2
 "}}}1
 
@@ -610,12 +688,13 @@ call vundle#end()
 
     " Disable highlight when <leader><cr> is pressed
     noremap<silent> <leader><cr> :noh<cr>
+    noremap<silent> <leader><Esc> :ccl<cr>
 
     " Managing windows {{{2
-        noremap <leader>j <C-W>j
-        noremap <leader>k <C-W>k
-        noremap <leader>h <C-W>h
-        noremap <leader>l <C-W>l
+        noremap gj <C-W>j
+        noremap gk <C-W>k
+        noremap gh <C-W>h
+        noremap gl <C-W>l
         set splitright
         set splitbelow
         " Seleting Window's
@@ -641,15 +720,31 @@ call vundle#end()
         command -nargs=1 S2 :2match search /<args>/
         command -nargs=1 S3 :3match search /<args>/
         command -nargs=1 IS2 :match incsearch /<args>/
-        nnoremap <leader>r :%s///gc<Left><Left><Left><Left>
-        nnoremap <leader>rw :%s/<C-r><C-w>//gc<Left><Left><Left>
+        nnoremap gr :%s///gc<Left><Left><Left><Left>
+        nnoremap grw :%s/<C-r><C-w>//gc<Left><Left><Left>
+        nnoremap griw :%s/\<<C-r><C-w>\>//gc<Left><Left><Left>
     "}}}2
 
+    " Fold Toggle {{{2
+	nnoremap zf :call FoldColumnToggle()<cr>
+
+	function! FoldColumnToggle()
+        if &foldlevel
+        	setlocal foldmethod=syntax
+            setlocal foldminlines=0
+            setlocal foldlevel=0
+        else
+        	setlocal foldmethod=syntax
+            setlocal foldminlines=10
+            setlocal foldlevel=4
+        endif
+	endfunction
+    "}}}2
     "Cscope & Tag Settings {{{2
     "-----------------------------------------------------------
         set cst
         set csto=1
-        set tags=tags
+        set tags=./tags;,tags;,.git/hooks/tags;
         
         if &diff
         else
@@ -659,65 +754,81 @@ call vundle#end()
         if filereadable("cscope.out")
             cs add cscope.out
         endif
+
+        " Autoloading Cscope Database
+        function! LoadCscope()
+            let db = findfile("cscope.out", ".git/hooks/;")
+            if (!empty(db))
+                let path = strpart(db, 0, match(db, "/cscope.out$"))
+                set nocscopeverbose " suppress duplicate connection error
+                exe "cs add " . db . " " . path
+                set cscopeverbose
+                set autowrite
+            endif
+        endfunction
+
+        call LoadCscope()
+
+        if filereadable(".git/hooks/my_proj.vim") 
+            source .git/hooks/my_proj.vim 
+        endif 
+
         " use both cscope and ctag for 'ctrl-]', ':ta', and 'vim -t'
         "set cscopetag
         " My mappings for managing tabs
-        "0 or s: Find this C symbol
-        "1 or g: Find this definition
-        "2 or d: Find functions called by this function
-        "3 or c: Find functions calling this function
-        "4 or t: Find this text string
-        "6 or e: Find this egrep pattern
-        "7 or f: Find this file
-        "8 or i: Find files #including this file
+	    " 0 or s: Find this C symbol
+	    " 1 or g: Find this definition
+	    " 2 or d: Find functions called by this function
+	    " 3 or c: Find functions calling this function
+	    " 4 or t: Find this text string
+	    " 6 or e: Find this egrep pattern
+	    " 7 or f: Find this file
+	    " 8 or i: Find files #including this file
+	    " 9 or a: Find places where this symbol is assigned a value
 
-        noremap<localleader>s "zyiw:exe "tab cs find 0 ".@z.""<CR>
-        noremap<localleader>g "zyiw:exe "tab cs find 1 ".@z.""<CR>
-        noremap<localleader>d "zyiw:exe "tab cs find 2 ".@z.""<CR>
-        noremap<localleader>c "zyiw:exe "tab cs find 3 ".@z.""<CR>
-        noremap<localleader>t "zyiw:exe "tab cs find 4 ".@z.""<CR>
-        noremap<localleader>e "zyiw:exe "tab cs find 6 ".@z.""<CR>
-        noremap<localleader>f "zyiw:exe "tab cs find 7 ".@z.""<CR>
-        noremap<localleader>i "zyiw:exe "tab cs find 8 ".@z.""<CR>
+        " Hitting '\s' symbol searches current word 
+        "noremap<localleader>s "zyiw:exe "tab cs find 0 ".@z.""<CR>
+        "noremap<localleader>g "zyiw:exe "tab cs find 1 ".@z.""<CR>
+        "noremap<localleader>d "zyiw:exe "tab cs find 2 ".@z.""<CR>
+        "noremap<localleader>c "zyiw:exe "tab cs find 3 ".@z.""<CR>
+        "noremap<localleader>t "zyiw:exe "tab cs find 4 ".@z.""<CR>
+        "noremap<localleader>e "zyiw:exe "tab cs find 6 ".@z.""<CR>
+        "noremap<localleader>f "zyiw:exe "tab cs find 7 ".@z.""<CR>
+        "noremap<localleader>i "zyiw:exe "tab cs find 8 ".@z.""<CR>
 
-        "noremap<locallocalleader>s "zyiw:exe "tab cs find 0 ".@z.""<CR>
-        "noremap<locallocalleader>g "zyiw:exe "tab cs find 1 ".@z.""<CR>
-        "noremap<locallocalleader>d "zyiw:exe "tab cs find 2 ".@z.""<CR>
-        "noremap<locallocalleader>c "zyiw:exe "tab cs find 3 ".@z.""<CR>
-        "noremap<locallocalleader>t "zyiw:exe "tab cs find 4 ".@z.""<CR>
-        "noremap<locallocalleader>e "zyiw:exe "tab cs find 6 ".@z.""<CR>
-        "noremap<locallocalleader>f "zyiw:exe "tab cs find 7 ".@z.""<CR>
-        "noremap<locallocalleader>i "zyiw:exe "tab cs find 8 ".@z.""<CR>
-        " Using ',hcX' searches current word and makes the vim
+        nmap <silent> <localleader>s :call Cscope('0', expand('<cword>'))<CR>
+        nmap <silent> <localleader>g :call Cscope('1', expand('<cword>'))<CR>
+        nmap <silent> <localleader>d :call Cscope('2', expand('<cword>'))<CR>
+        nmap <silent> <localleader>c :call Cscope('3', expand('<cword>'))<CR>
+        nmap <silent> <localleader>t :call Cscope('4', expand('<cword>'))<CR>
+        nmap <silent> <localleader>e :call Cscope('6', expand('<cword>'))<CR>
+        nmap <silent> <localleader>f :call Cscope('7', expand('<cword>'))<CR>
+        nmap <silent> <localleader>i :call Cscope('8', expand('<cword>'))<CR>
+        nmap <silent> <localleader>a :call Cscope('9', expand('<cword>'))<CR>
+
+        " Using '\hcX' searches current word and makes the vim
         " window split horizontally, with search result displayed
         " in the new window.
-        noremap<localleader>hs "zyiw:exe "scs find 0 ".@z.""<CR>
-        noremap<localleader>hg "zyiw:exe "scs find 1 ".@z.""<CR>
-        noremap<localleader>hd "zyiw:exe "scs find 2 ".@z.""<CR>
-        noremap<localleader>hc "zyiw:exe "scs find 3 ".@z.""<CR>
-        noremap<localleader>ht "zyiw:exe "scs find 4 ".@z.""<CR>
-        noremap<localleader>he "zyiw:exe "scs find 6 ".@z.""<CR>
-        noremap<localleader>hf "zyiw:exe "scs find 7 ".@z.""<CR>
-        noremap<localleader>hi "zyiw:exe "scs find 8 ".@z.""<CR>
+        nmap<localleader>hs "zyiw:exe "scs find 0 ".@z.""<CR>
+        nmap<localleader>hg "zyiw:exe "scs find 1 ".@z.""<CR>
+        nmap<localleader>hd "zyiw:exe "scs find 2 ".@z.""<CR>
+        nmap<localleader>hc "zyiw:exe "scs find 3 ".@z.""<CR>
+        nmap<localleader>ht "zyiw:exe "scs find 4 ".@z.""<CR>
+        nmap<localleader>he "zyiw:exe "scs find 6 ".@z.""<CR>
+        nmap<localleader>hf "zyiw:exe "scs find 7 ".@z.""<CR>
+        nmap<localleader>hi "zyiw:exe "scs find 8 ".@z.""<CR>
 
-        " Hitting ',vcsX' searches current word and does a vertical
+        " Hitting '\vcsX' searches current word and does a vertical
         " split instead of a horizontal one
-        noremap<localleader>vs "zyiw:exe "vert scs find 0 ".@z.""<CR>
-        noremap<localleader>vg "zyiw:exe "vert scs find 1 ".@z.""<CR>
-        noremap<localleader>vd "zyiw:exe "vert scs find 2 ".@z.""<CR>
-        noremap<localleader>vc "zyiw:exe "vert scs find 3 ".@z.""<CR>
-        noremap<localleader>vt "zyiw:exe "vert scs find 4 ".@z.""<CR>
-        noremap<localleader>ve "zyiw:exe "vert scs find 6 ".@z.""<CR>
-        noremap<localleader>vf "zyiw:exe "vert scs find 7 ".@z.""<CR>
-        noremap<localleader>vi "zyiw:exe "vert scs find 8 ".@z.""<CR>
+        nmap<localleader>vs "zyiw:exe "vert scs find 0 ".@z.""<CR>
+        nmap<localleader>vg "zyiw:exe "vert scs find 1 ".@z.""<CR>
+        nmap<localleader>vd "zyiw:exe "vert scs find 2 ".@z.""<CR>
+        nmap<localleader>vc "zyiw:exe "vert scs find 3 ".@z.""<CR>
+        nmap<localleader>vt "zyiw:exe "vert scs find 4 ".@z.""<CR>
+        nmap<localleader>ve "zyiw:exe "vert scs find 6 ".@z.""<CR>
+        nmap<localleader>vf "zyiw:exe "vert scs find 7 ".@z.""<CR>
+        nmap<localleader>vi "zyiw:exe "vert scs find 8 ".@z.""<CR>
 
-        "Cscope shortcuts
-        " f: Find this file
-        " g: Find this definition
-        " c: Find functions calling this function
-        " s: Find this C symbol
-        " t: Find assignments to
-        " d: Find functions called by this function
         command -nargs=+ Cf cs find f <args>
         command -nargs=+ Cg cs find g <args>
         command -nargs=+ Cc cs find c <args>
@@ -726,14 +837,9 @@ call vundle#end()
         command -nargs=+ Cd cs find d <args>
         command -nargs=+ Ci cs find i <args>
         command -nargs=+ Ce cs find e <args>
+        command -nargs=+ Ca cs find a <args>
     "}}}2
 "}}}1
-
-" My Mappings {{{1
-    " Tag- Use backspace to jump back {{{2
-		nmap <bs> <C-t>
-		nmap <cr> <c-]>
-    "}}}2
 
     " Command line spell corrections {{{2
     cnoreabbrev <expr> W ((getcmdtype() is# ':' && getcmdline() is# 'W')?('w'):('W'))
@@ -766,19 +872,52 @@ call vundle#end()
     "VTR Functions {{{2
     :source ~/.vim/flexranVtrFunction.vim
     :source ~/.vim/adkVtrFunction.vim
+    :source ~/.vim/fzfCscope.vim
+    "}}}2
+    
+    "SurroundMe {{{2
+        vmap [ :norm!Tab [Tab<CR>
     "}}}2
 "}}}1
 
 "Autocmd Configs {{{1
-function VimFileSettings()
-    setlocal foldmethod=marker
-    setlocal foldlevel=1
-    setlocal foldminlines=10
-    setlocal foldenable
-    :highlight Folded ctermbg=darkgrey ctermfg=white
-endfunction
+    "Vim File Settings{{{2
+        function VimFileSettings()
+            setlocal foldmethod=marker
+            setlocal foldlevel=1
+            setlocal foldminlines=10
+            setlocal foldenable
+            highlight Folded ctermbg=darkgrey ctermfg=white
+        endfunction
+        autocmd Filetype vim call VimFileSettings()
+    "}}}2
 
-autocmd Filetype vim call VimFileSettings()
+    "Cpp File Settings{{{2
+        function CppFileSettings()
+             setlocal cindent 
+             setlocal cino=j1,(0,ws,Ws)
+             setlocal textwidth=80
+             let c_space_errors=1
+             let java_space_errors=1 
+             let java_space_errors=1 
+             let c_no_trail_space_error=1
+             let c_no_tab_space_error=1
+        endfunction
+        autocmd Filetype cpp call CppFileSettings()
+    "}}}2
+
+    "C File Settings{{{2
+        function CFileSettings()
+            setlocal textwidth=80
+            let c_space_errors=1
+            let java_space_errors=1 
+            let java_space_errors=1 
+            let c_no_trail_space_error=1
+            let c_no_tab_space_error=1
+        endfunction
+        autocmd Filetype cpp call CFileSettings()
+    "}}}2
+
 " Return to last edit position when opening files (You want this!)
 autocmd BufReadPost *
             \ if line("'\"") > 0 && line("'\"") <= line("$") |

@@ -95,4 +95,24 @@ snippet fapilog "description" b
 FAPI_LOG($1`!p snip.rv=complete(t[1], ['INFO_LOG', 'DEBUG_LOG', 'ERROR_LOG', 'TRACE_LOG'])`, ("[$2`!p snip.rv=complete(t[2], ['FAPI_INT', 'IA_FAPI', 'FAPI WLS', 'FAPI_ULCONFIG', 'FAPI_DLCONFIG', 'FAPI_TX', 'RX_IND', 'FAPI_P5'])`] $3",$4));$0
 endsnippet
 
+snippet [
+[$0${VISUAL}
+endsnippet
 
+snippet <
+<$0${VISUAL}>
+endsnippet
+
+snippet (
+($0${VISUAL}
+endsnippet
+
+snippet {
+{$0${VISUAL}
+endsnippet
+
+snippet d2s "#define2switch" b
+case ${1:`!p
+snip.rv = snip.v.text.split()[1]
+`}: break;
+endsnippet
