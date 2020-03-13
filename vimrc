@@ -65,7 +65,6 @@ Plugin 'mileszs/ack.vim'
 Plugin 'vinodkri/vim-tmux-runner'
 
 Plugin 'Valloric/YouCompleteMe'
-"Plugin 'ervandew/supertab'
 
 "Plugin 'fatih/vim-go'
 "Plugin 'rust-lang/rust'
@@ -77,395 +76,41 @@ call vundle#end()
 set encoding=utf-8
 
 " Plugin Specific Configurations {{{1
-	" FZF Plugin --- {{{2
-        " An action can be a reference to a function that processes selected lines
-        function! s:build_quickfix_list(lines)
-          call setqflist(map(copy(a:lines), '{ "filename": v:val }'))
-          copen
-          cc
-        endfunction
-
-        let g:fzf_action = {
-          \ 'ctrl-q': function('s:build_quickfix_list'),
-          \ 'ctrl-t': 'tab split',
-          \ 'ctrl-x': 'split',
-          \ 'ctrl-v': 'vsplit' }
-
-        " Default fzf layout
-        " - down / up / left / right
-        let g:fzf_layout = { 'down': '~40%' }
-
-        " Customize fzf colors to match your color scheme
-        let g:fzf_colors =
-        \ { 'fg':      ['fg', 'Normal'],
-          \ 'bg':      ['bg', 'Normal'],
-          \ 'hl':      ['fg', 'Comment'],
-          \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
-          \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
-          \ 'hl+':     ['fg', 'Statement'],
-          \ 'info':    ['fg', 'PreProc'],
-          \ 'border':  ['fg', 'Ignore'],
-          \ 'prompt':  ['fg', 'Conditional'],
-          \ 'pointer': ['fg', 'Exception'],
-          \ 'marker':  ['fg', 'Keyword'],
-          \ 'spinner': ['fg', 'Label'],
-          \ 'header':  ['fg', 'Comment'] }
-
-        " Enable per-command history.
-        " CTRL-N and CTRL-P will be automatically bound to next-history and
-        " previous-history instead of down and up. If you don't like the change,
-        " explicitly bind the keys to down and up in your $FZF_DEFAULT_OPTS.
-        let g:fzf_history_dir = '~/.local/share/fzf-history'
-
-        "FZF mapping {{{3
-            "Simple MRU search
-            command! FZFMru call fzf#run({
-                        \ 'source':  reverse(s:all_files()),
-                        \ 'sink':    'edit',
-                        \ 'options': '-m -x +s',
-                        \ 'down':    '40%' })
-
-            function! s:all_files()
-                return extend(
-                            \ filter(copy(v:oldfiles),
-                            \        "v:val !~ 'fugitive:\\|NERD_tree\\|^/tmp/\\|.git/'"),
-                            \ map(filter(range(1, bufnr('$')), 'buflisted(v:val)'), 'bufname(v:val)'))
-            endfunction
-
-            "Jump to tags
-            function! s:tags_sink(line)
-                let parts = split(a:line, '\t\zs')
-                let excmd = matchstr(parts[2:], '^.*\ze;"\t')
-                execute 'silent e' parts[1][:-2]
-                let [magic, &magic] = [&magic, 0]
-                execute excmd
-                let &magic = magic
-            endfunction
-
-            function! s:tags()
-                echom 'Preparing tags'
-                if empty(tagfiles())
-                    echohl WarningMsg
-                    echom 'Preparing tags'
-                    echohl None
-                    call system('ctags -R')
-                endif
-
-                call fzf#run({
-                            \ 'source':  'cat '.join(map(tagfiles(), 'fnamemodify(v:val, ":S")')).
-                            \            '| grep -v -a ^!',
-                            \ 'options': '+m -d "\t" --with-nth 1,4.. -n 1 --tiebreak=index',
-                            \ 'down':    '40%',
-                            \ 'sink':    function('s:tags_sink')})
-            endfunction
-
-            command! Tags call s:tags()
-
-            "Jump to tags in the current buffer
-            function! s:align_lists(lists)
-                let maxes = {}
-                for list in a:lists
-                    let i = 0
-                    while i < len(list)
-                        let maxes[i] = max([get(maxes, i, 0), len(list[i])])
-                        let i += 1
-                    endwhile
-                endfor
-                for list in a:lists
-                    call map(list, "printf('%-'.maxes[v:key].'s', v:val)")
-                endfor
-                return a:lists
-            endfunction
-
-            function! s:btags_source()
-                let lines = map(split(system(printf(
-                            \ 'ctags -f - --sort=no --excmd=number --language-force=%s %s',
-                            \ &filetype, expand('%:S'))), "\n"), 'split(v:val, "\t")')
-                if v:shell_error
-                    throw 'failed to extract tags'
-                endif
-                return map(s:align_lists(lines), 'join(v:val, "\t")')
-            endfunction
-
-            function! s:btags_sink(line)
-                execute split(a:line, "\t")[2]
-            endfunction
-
-            function! s:btags()
-                try
-                    call fzf#run({
-                                \ 'source':  s:btags_source(),
-                                \ 'options': '+m -d "\t" --with-nth 1,4.. -n 1 --tiebreak=index',
-                                \ 'down':    '40%',
-                                \ 'sink':    function('s:btags_sink')})
-                catch
-                    echohl WarningMsg
-                    echom v:exception
-                    echohl None
-                endtry
-            endfunction
-
-            command! BTags call s:btags()
-
-            function! s:line_handler(l)
-                let keys = split(a:l, ':\t')
-                exec 'buf' keys[0]
-                exec keys[1]
-                normal! ^zz
-            endfunction
-
-            "Search lines in all open vim buffers
-            function! s:buffer_lines()
-                let res = []
-                for b in filter(range(1, bufnr('$')), 'buflisted(v:val)')
-                    call extend(res, map(getbufline(b,0,"$"), 'b . ":\t" . (v:key + 1) . ":\t" . v:val '))
-                endfor
-                return res
-            endfunction
-
-            command! FZFLines call fzf#run({
-                        \   'source':  <sid>buffer_lines(),
-                        \   'sink':    function('<sid>line_handler'),
-                        \   'options': '--extended --nth=3..',
-                        \   'down':    '60%'
-                        \})
-
-            "Fuzzy search files in parent directory of current file
-            function! s:fzf_neighbouring_files()
-                let current_file =expand("%")
-                let cwd = fnamemodify(current_file, ':p:h')
-                let command = 'ag -g "" -f ' . cwd . ' --depth 0'
-
-                call fzf#run({
-                            \ 'source': command,
-                            \ 'sink':   'e',
-                            \ 'options': '-m -x +s',
-                            \ 'window':  'enew' })
-            endfunction
-
-            command! FZFNeigh call s:fzf_neighbouring_files()
-
-            nmap <space>f  :Files<CR>
-            nmap <space>g  :GFiles<CR>
-            nmap <space>b  :Buffers<CR>
-            nmap <space>w  :Windows<CR>
-            nmap <space>l  :Lines<CR>
-            nmap <space>bl :BLines<CR>
-            nmap <space>t  :Tags<CR>
-            nmap <space>bt :BTags<CR>
-            nmap <space>s  :Snippets<CR>
-
-            " Insert mode completion
-            inoremap <c-x>t <plug>(fzf-complete-word)
-            "imap <c-x><c-f> <plug>(fzf-complete-path)
-            "imap <c-x><c-j> <plug>(fzf-complete-file-ag)
-            imap <c-x><c-l> <plug>(fzf-complete-line)
-            imap <c-x><c-b> <plug>(fzf-complete-buffer-line)
-
-            " Better command history with q:
-            command! CmdHist call fzf#vim#command_history({'down': '20'})
-            nnoremap q: :CmdHist<CR>
-        "}}}3
-	"}}}2
-
-	"Incsearch Plugin --- {{{2
-        set hlsearch
-        set incsearch
-        map /  <Plug>(incsearch-forward)
-        map ?  <Plug>(incsearch-backward)
-        map g/ <Plug>(incsearch-stay)
-        map n  <Plug>(incsearch-nohl-n)
-        map N  <Plug>(incsearch-nohl-N)
-        map *  <Plug>(incsearch-nohl-*)
-        map #  <Plug>(incsearch-nohl-#)
-        map g* <Plug>(incsearch-nohl-g*)
-        map g# <Plug>(incsearch-nohl-g#)
+    " FZF Plugin --- {{{2
+        :source ~/.vim/fzf_setting_and_mappings.vim
     "}}}2
-
+	"Incsearch Plugin --- {{{2
+        :source ~/.vim/incsearch.vim
+    "}}}2
 	" YouCompleteMe Plugin --- {{{2
-    let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
-    let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
-    let g:ycm_complete_in_comments = 1
-    let g:ycm_seed_identifiers_with_syntax = 1
-    let g:ycm_collect_identifiers_from_comments_and_strings = 1
-    "let g:ycm_key_invoke_completion = '<C-Space>'
-    let g:ycm_key_list_select_completion = ['<Enter']
-    let g:ycm_add_preview_to_completeopt = 1
-    "let g:ycm_autoclose_preview_window_after_insertion = 1
-    let g:ycm_autoclose_preview_window_after_completion = 1
-    let g:ycm_enable_diagnostic_highlighting = 0
-    let g:ycm_warning_symbol = '!'
-
-    ""}}}2
-
-	" SuperTab Plugin --- {{{2
-    "let g:SuperTabDefaultCompletionType = '<c-n>'
-
+        :source ~/.vim/YouCompleteMe.vim
     ""}}}2
 	" UltiSnips Plugin --- {{{2
-        let g:UltiSnipsExpandTrigger="<Tab>"
-        let g:UltiSnipsJumpForwardTrigger="<c-n>"
-        let g:UltiSnipsJumpBackwardTrigger="<c-k>"
-
-        let g:UltiSnipsEditSplit="vertical"
-
-        " If you want :UltiSnipsEdit to split your window.
-        let g:UltiSnipsEditSplit='vertical'
-
-        " explicitly tell UltiSnips to use python3
-        let g:UltiSnipsUsePythonVersion = 3
-
-        " Split vertically
-        let g:UltiSnipsEditSplit = 'context'
-
-        " Snippets Path
-        let g:UltiSnipsSnippetsDir= '~/vim-wow-moments/mycoolsnips'
-        let g:UltiSnipsSnippetDirectories=[".vim/bundle/vim-snippets/UltiSnips", "mycoolsnips"]
+        :source ~/.vim/UltiSnips.vim
 	"}}}2
-
-    "Vim Taboo Setting {{{2
-        "make vim remember tab names across sessions
-         "set sessionoptions+=tabpages,globals
-         "let g:taboo_tab_format="[%N:%W]%f "
-    "}}}2
-
     "{{{2 NerdCommentery
-        "Add your own custom formats or override the defaults
-        let g:NERDCustomDelimiters = { 'c': { 'left': '//'} }
-        " Use compact syntax for prettified multi-line comments
-        let g:NERDCompactSexyComs = 1
-        " Align line-wise comment delimiters flush left instead of following code
-        " indentation
-        let g:NERDDefaultAlign = 'left'
+        :source ~/.vim/NerdCommentery.vim
     "}}}2
-
     "{{{2 Rusty
         let g:rustfmt_autosave = 1
     "}}}2
-
     "Airline Settings {{{2
-        let g:airline_theme='ayu_dark'
-        "Tmux settings
-        let g:airline#extensions#tmuxline#enabled = 1
-        let g:tmuxline_separators = {
-            \ 'left' : '',
-            \ 'left_alt': '|',
-            \ 'right' : '',
-            \ 'right_alt' : '|',
-            \ 'space' : ' '}
-        "Vim Settings
-        let g:airline#extensions#default#layout = [
-              \ [ 'a', 'b', 'c' ],
-              \ [ 'x', 'z' ]
-              \ ]
-        let g:airline_extensions = ['branch', 'tabline']
-        let g:airline#extensions#branch#enabled = 1
-        let g:airline#extensions#tabline#left_sep = '||'
-        let g:airline#extensions#tabline#left_alt_sep = '||'
-        let g:airline#extensions#quickfix#quickfix_text = 'Quickfix'
-        let g:airline#extensions#quickfix#location_text = 'Location'
-        let g:airline#extensions#tabline#enabled = 1
-        let g:airline#extensions#tabline#tab_nr_type = 2
-        let g:airline#extensions#tabline#show_splits = 1
-        let g:airline#extensions#tabline#show_tabs = 1
-        let g:airline#extensions#tabline#tabs_label = 'TABS'
-        let g:airline#extensions#tabline#buffers_label = 'BUFFERS'
-        let g:airline#extensions#tabline#formatter = 'unique_tail'
-        let g:airline#extensions#tabline#show_buffers = 0
-        let g:airline#extensions#taboo#enabled = 1
+        :source ~/.vim/Airline.vim
     "}}}2
-
     "GitGutter Mappings {{{2
-        "Cycle through all hunk changes in all files
-        function! NextHunkAllBuffers()
-			let line = line('.')
-			GitGutterNextHunk
-			if line('.') != line
-				return
-			endif
-
-			let bufnr = bufnr('')
-			while 1
-				bnext
-				if bufnr('') == bufnr
-					return
-				endif
-				if !empty(GitGutterGetHunks())
-					normal! 1G
-					GitGutterNextHunk
-					return
-				endif
-			endwhile
-		endfunction
-
-		function! PrevHunkAllBuffers()
-			let line = line('.')
-			GitGutterPrevHunk
-			if line('.') != line
-				return
-			endif
-
-			let bufnr = bufnr('')
-			while 1
-				bprevious
-				if bufnr('') == bufnr
-					return
-				endif
-				if !empty(GitGutterGetHunks())
-					normal! G
-					GitGutterPrevHunk
-					return
-				endif
-			endwhile
-		endfunction
-
-		nmap <silent> ]c :call NextHunkAllBuffers()<CR>
-		nmap <silent> [c :call PrevHunkAllBuffers()<CR>
-        "nmap <silent> ]w :%s/\s\+$// <CR>
-
-		function! CleanUp(...)
-			if a:0  " opfunc
-				let [first, last] = [line("'["), line("']")]
-			else
-				let [first, last] = [line("'<"), line("'>")]
-			endif
-			for lnum in range(first, last)
-				let line = getline(lnum)
-
-				" clean up the text, e.g.:
-				let line = substitute(line, '\s\+$', '', '')
-
-				call setline(lnum, line)
-			endfor
-		endfunction
-
-		nmap <silent> <leader>x :set opfunc=CleanUp<CR>g@
+        :source ~/.vim/GitGutter.vim
     "}}}2
-
     "VTR {{{2
         let g:VtrUseVtrMaps = 1
     "}}}2
-
     "AutoTagBar {{{2
         nmap <F4> :TagbarToggle<CR>
     "}}}2
-    
-    "Indentation {{{2
-        let g:indent_guides_enable_on_vim_startup = 1
-        let g:indent_guides_guide_size = 1
-        let g:indent_guides_start_level = 2
-        let g:indent_guides_auto_colors = 0
-        let g:indent_guides_indent_levels = 6
-        let g:indent_guides_color_change_percent = 10
-        autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  ctermbg=grey
-        autocmd VimEnter,Colorscheme * :hi IndentGuidesEven ctermbg=darkgrey
-        nmap <silent> yig <Plug>IndentGuidesToggle
+    "Indentation Guide Lines {{{2
+        :source ~/.vim/IndentGuides.vim
     "}}}
     "vim-cpp-enhanced-highlight {{{2
-        let g:cpp_class_scope_highlight = 1
-        let g:cpp_member_variable_highlight = 1
-        let g:cpp_class_decl_highlight = 1
-        let g:cpp_posix_standard = 1
+        :source ~/.vim/vim-cpp-enhanced-highlight.vim
     ""}}}2
 "}}}1
 
