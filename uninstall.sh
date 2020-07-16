@@ -14,3 +14,4 @@ rm -f ~/.vim/incsearch.vim
 rm -f ~/.vim/vim-cpp-enhanced-highlight.vim
 rm -f ~/.vim/cscope_tag_settings.vim
 rm -f ~/.vim/MyQuirkyKeyBindings.vim
+rm -f ~/.vim/AutoTagBarSettings.vim

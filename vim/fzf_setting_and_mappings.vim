@@ -36,7 +36,7 @@
     " CTRL-N and CTRL-P will be automatically bound to next-history and
     " previous-history instead of down and up. If you don't like the change,
     " explicitly bind the keys to down and up in your $FZF_DEFAULT_OPTS.
-    let g:fzf_history_dir = '~/.local/share/fzf-history'
+    let g:fzf_history_dir = '~/.fzf-history'
 
 "FZF mapping
     "Simple MRU search
@@ -177,11 +177,11 @@
     nmap <space>s  :Snippets<CR>
 
     " Insert mode completion
-    inoremap <c-x>t <plug>(fzf-complete-word)
+    "inoremap <c-x>t <plug>(fzf-complete-word)
     "imap <c-x><c-f> <plug>(fzf-complete-path)
     "imap <c-x><c-j> <plug>(fzf-complete-file-ag)
-    imap <c-x><c-l> <plug>(fzf-complete-line)
-    imap <c-x><c-b> <plug>(fzf-complete-buffer-line)
+    "imap <c-x><c-l> <plug>(fzf-complete-line)
+    "imap <c-x><c-b> <plug>(fzf-complete-buffer-line)
 
     " Better command history with q:
     command! CmdHist call fzf#vim#command_history({'down': '20'})

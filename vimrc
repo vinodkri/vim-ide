@@ -28,6 +28,8 @@ Plugin 'haya14busa/incsearch.vim'
 Plugin 'tpope/vim-fugitive'
 Plugin 'tpope/vim-unimpaired'
 Plugin 'tpope/vim-repeat'
+Plugin 'tpope/vim-obsession'
+Plugin 'will133/vim-dirdiff'
 Plugin 'airblade/vim-gitgutter'
 "Indent guide lines.
 Plugin 'nathanaelkane/vim-indent-guides'
@@ -104,7 +106,7 @@ set encoding=utf-8
         let g:VtrUseVtrMaps = 1
     "}}}2
     "AutoTagBar {{{2
-        nmap <F4> :TagbarToggle<CR>
+        :source ~/.vim/AutoTagBarSettings.vim
     "}}}2
     "Indentation Guide Lines {{{2
         :source ~/.vim/IndentGuides.vim
@@ -115,7 +117,7 @@ set encoding=utf-8
 "}}}1
 
 " Default settings for vim
-    :source ~/.vim/MyQuirkyKeyBindings.vim
+:source ~/.vim/MyQuirkyKeyBindings.vim
 "Cscope & Tag Settings
 :source ~/.vim/cscope_tag_settings.vim
 "VTR Functions

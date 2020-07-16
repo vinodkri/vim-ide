@@ -5,6 +5,8 @@ set nopaste
 set background=dark
 if &diff
     colorscheme pablo
+    windo set nofoldenable
+    set diffopt=filler,context:1000000
 else
     colorscheme desert
 endif
@@ -93,12 +95,13 @@ cnoremap <c-e> <End>
 inoremap <c-a> <c-o>^
 inoremap <c-a><c-a> <c-o>0
 inoremap <c-e> <c-o>$
-nnoremap <C-x> :b#<CR>
+nnoremap <C-x><C-x> :b#<CR>
 
 "My Quirky Hacks
 " Tag- Use backspace to jump back
 nmap <bs> <C-t>
 nmap <cr> <c-]>
+nmap g<cr> <C-w><C-]><C-w>T
 nmap <C-n> :cn<CR>
 nmap <C-p> :cp<CR>
 map <ScrollWheelUp> <c-y>
@@ -235,6 +238,7 @@ command -nargs=1 S3 :3match search /<args>/
 command -nargs=1 IS2 :match incsearch /<args>/
 nnoremap gr :%s///gc<Left><Left><Left><Left>
 nnoremap grw :%s/<C-r><C-w>//gc<Left><Left><Left>
+nnoremap grww :%s/<C-r><C-w>/<C-r><C-w>/gc<Left><Left><Left>
 nnoremap griw :%s/\<<C-r><C-w>\>//gc<Left><Left><Left>
 
 nnoremap zf :call FoldColumnToggle()<cr>
@@ -276,3 +280,11 @@ noremap 9<Tab> 9gt
 " Opens a new tab with the current buffer's path
 " Super useful when editing files in the same directory
 noremap<leader>te :tabedit <c-r>=expand("%:p:h")<CR>/
+
+"nnoremap <-j> :m .+1<CR>==
+"nnoremap <-k> :m .-2<CR>==
+"inoremap <-j> <Esc>:m .+1<CR>==gi
+"inoremap <-k> <Esc>:m .-2<CR>==gi
+vnoremap <Down> :m '>+1<CR>gv=gv
+vnoremap <Up> :m '<-2<CR>gv=gv
+

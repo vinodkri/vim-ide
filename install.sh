@@ -14,3 +14,4 @@ ln -s $(pwd)/vim/incsearch.vim ~/.vim/incsearch.vim
 ln -s $(pwd)/vim/vim-cpp-enhanced-highlight.vim ~/.vim/vim-cpp-enhanced-highlight.vim
 ln -s $(pwd)/vim/cscope_tag_settings.vim ~/.vim/cscope_tag_settings.vim
 ln -s $(pwd)/vim/MyQuirkyKeyBindings.vim ~/.vim/MyQuirkyKeyBindings.vim
+ln -s $(pwd)/vim/AutoTagBarSettings.vim ~/.vim/AutoTagBarSettings.vim
