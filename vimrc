@@ -16,7 +16,7 @@ set runtimepath=$VIM,$VIMRUNTIME
 set nocompatible
 set rtp+=~/.vim/bundle/Vundle.vim
 set rtp+=~/.fzf
-set rtp+=~/vim-wow-moments
+set rtp+=~/vim-ide
 call vundle#begin()
 Plugin 'VundleVim/Vundle.vim'
 "FZF
@@ -29,8 +29,12 @@ Plugin 'tpope/vim-fugitive'
 Plugin 'tpope/vim-unimpaired'
 Plugin 'tpope/vim-repeat'
 Plugin 'tpope/vim-obsession'
+"Diff Directory
 Plugin 'will133/vim-dirdiff'
+"Mark git changes.
 Plugin 'airblade/vim-gitgutter'
+"SuperTab
+Plugin 'ervandew/supertab'
 "Indent guide lines.
 Plugin 'nathanaelkane/vim-indent-guides'
 "Snippets manager
@@ -41,8 +45,6 @@ Plugin 'sirver/ultisnips'
 Plugin 'octol/vim-cpp-enhanced-highlight'
 "Highlight typedef, enums etc
 Plugin 'TagHighlight'
-"Tab Renaming
-"Plugin 'gcmt/taboo.vim'
 "Tame QuickFix
 Plugin 'romainl/vim-qf'
 "Tame code comments
@@ -51,27 +53,39 @@ Plugin 'scrooloose/nerdcommenter'
 Plugin 'raimondi/delimitmate'
 "Enable yanking and pasting text between vim buffers across panes/windows
 Plugin 'gsiano/vmux-clipboard'
-
 "Restore FocusGained and FocusLost events
 Plugin 'tmux-plugins/vim-tmux-focus-events'
-
 "Theme
 Plugin 'vim-airline/vim-airline'
 Plugin 'vim-airline/vim-airline-themes'
 Plugin 'edkolev/tmuxline.vim'
-
 " ACK -- fast grep
 Plugin 'mileszs/ack.vim'
-
+"Plugins to help with C/C++ development env
 "Plugin 'christoomey/vim-tmux-runner'
 Plugin 'vinodkri/vim-tmux-runner'
-
+Plugin 'skywind3000/asynctasks.vim'
+Plugin 'skywind3000/asyncrun.vim'
+"Auto complete
 Plugin 'Valloric/YouCompleteMe'
-
 "Plugin 'fatih/vim-go'
 "Plugin 'rust-lang/rust'
-
+"List tags in a bar
 Plugin 'majutsushi/tagbar'
+
+"Testing
+"Plugin 'LucHermitte/lh-vim-lib'
+"Plugin 'LucHermitte/lh-style'
+"Plugin 'LucHermitte/lh-tags'
+"Plugin 'LucHermitte/lh-dev'
+"Plugin 'LucHermitte/lh-brackets'
+"Plugin 'LucHermitte/searchInRuntime'
+"Plugin 'LucHermitte/mu-template'
+"Plugin 'tomtom/stakeholders_vim'
+"Plugin 'LucHermitte/alternate-lite'
+"Plugin 'LucHermitte/lh-cpp'
+"Plugin 'LucHermitte/vim-refactor'
+
 call vundle#end()
 "}}}1
 
@@ -114,6 +128,13 @@ set encoding=utf-8
     "vim-cpp-enhanced-highlight {{{2
         :source ~/.vim/vim-cpp-enhanced-highlight.vim
     ""}}}2
+    let g:ycm_key_list_select_completion = ['<C-n>', '<Down>']
+    let g:ycm_key_list_previous_completion = ['<C-p>', '<Up>']
+    let g:SuperTabDefaultCompletionType = '<C-n>'
+
+    let g:UltiSnipsExpandTrigger = "<tab>"
+    let g:UltiSnipsJumpForwardTrigger = "<tab>"
+    let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
 "}}}1
 
 " Default settings for vim
@@ -161,6 +182,7 @@ vmap [ :norm!Tab [Tab<CR>
             let c_no_tab_space_error=1
         endfunction
         autocmd Filetype cpp call CFileSettings()
+        autocmd BufRead,BufNewFile *.h,*.c set filetype=c
     "}}}2
 
 " Return to last edit position when opening files (You want this!)

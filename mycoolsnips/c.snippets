@@ -82,6 +82,10 @@ snippet print "printf" b
 printf("$1\n"$2);$0
 endsnippet
 
+snippet snprintf "snprintf" b
+snprintf(${1:buff}, ${2:size}, "$3", $4);
+endsnippet
+
 global !p
 def complete(t, opts):
 	if t:
@@ -95,19 +99,50 @@ snippet fapilog "description" b
 FAPI_LOG($1`!p snip.rv=complete(t[1], ['INFO_LOG', 'DEBUG_LOG', 'ERROR_LOG', 'TRACE_LOG'])`, ("[$2`!p snip.rv=complete(t[2], ['FAPI_INT', 'IA_FAPI', 'FAPI WLS', 'FAPI_ULCONFIG', 'FAPI_DLCONFIG', 'FAPI_TX', 'RX_IND', 'FAPI_P5'])`] $3",$4));$0
 endsnippet
 
-snippet [
-[$0${VISUAL}
+snippet wlog "wacc logger" b
+WACC_LOGGER($1`!p snip.rv=complete(t[1], ['INFO', 'DEBUG', 'ERROR', 'TRACE'])`, ("$2",$3));$0
 endsnippet
 
-snippet <
+snippet #if0 "wrap the selected text with #if0"
+#if 0
+	${1:${VISUAL:text}}
+#endif
+endsnippet
+
+global !p
+def remove_pattern(txt, pat):
+	li = list(txt.split("\n"));
+	for p in pat:
+		if p in li: li.remove(p)
+	
+	return '\n'.join(li)
+endglobal
+
+snippet #dif "unwrap #if from selected text" b
+${1:`!p
+snip.rv = remove_pattern(snip.v.text, ["#if 0", "#endif"])
+`}
+endsnippet
+
+snippet #ifdef
+#ifdef $1
+${0:${VISUAL:#type here}}
+#endif
+endsnippet
+
+snippet []
+[$0${VISUAL}]
+endsnippet
+
+snippet <>
 <$0${VISUAL}>
 endsnippet
 
-snippet (
+snippet ()
 ($0${VISUAL}
 endsnippet
 
-snippet {
+snippet {}
 {$0${VISUAL}
 endsnippet
 

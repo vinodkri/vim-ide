@@ -19,9 +19,12 @@ set ttyfast
 " Set this to the name of your terminal that supports mouse codes.
 " Must be one of: xterm, xterm2, netterm, dec, jsbterm, pterm
 set ttymouse=xterm2
-set path=$PWD/**
+"set path=$PWD/**
+set path=.,**,../**
 set wildmenu
 set wildmode=list:longest
+set wildcharm=<C-z>
+set wildignorecase
 " To Remember
 " z. [z followed by a dot (.)] - to put the line with the cursor at the
 " center,
@@ -37,6 +40,11 @@ set ul=1000  " Undo levels
 " Enable persistent undo
 set undofile   " Maintain undo history between sessions
 set undodir=~/.git/hooks/
+
+"Enable project specific settings
+if filereadable(".git/hooks/project_settings.vim")
+    source .git/hooks/project_settings.vim
+endif
 
 "UI config
 set number "Show line numbers
@@ -82,9 +90,6 @@ highlight PmenuSel ctermbg=yellow
 "inoremap <expr><s-tab> pumvisible() ? \"\<c-p>" : \"\<s-tab>"
 "inoremap <expr> j pumvisible() ? \"\<c-n>" : \"j"
 "inoremap <expr> k pumvisible() ? \"\<c-p>" : \"k"
-" Vim Quick Fix movement
-nnoremap gn :cn<CR>
-nnoremap gp :cp<CR>
 " Close Preview winodow that open along with omnicomplete
 autocmd CompleteDone * pclose
 "Moving around command line
@@ -92,16 +97,18 @@ cnoremap <c-a> <Home>
 cnoremap <c-f> <S-Right>
 cnoremap <c-b> <S-Left>
 cnoremap <c-e> <End>
-inoremap <c-a> <c-o>^
-inoremap <c-a><c-a> <c-o>0
-inoremap <c-e> <c-o>$
+"Switch to last buffer
 nnoremap <C-x><C-x> :b#<CR>
 
 "My Quirky Hacks
+set splitright
+set splitbelow
 " Tag- Use backspace to jump back
-nmap <bs> <C-t>
-nmap <cr> <c-]>
-nmap g<cr> <C-w><C-]><C-w>T
+nmap <BS> <C-t>
+nmap <CR> <c-]>
+nmap gt<CR> <C-w><C-]><C-w>T
+nmap gs :vs<CR><C-]>
+nmap g<CR> <C-w>g}
 nmap <C-n> :cn<CR>
 nmap <C-p> :cp<CR>
 map <ScrollWheelUp> <c-y>
@@ -112,8 +119,6 @@ noremap ]] ]]zz
 noremap %  %zz
 noremap xn a<space><esc>
 noremap xp i<space><esc>
-noremap <space> <c-d>
-noremap <s-space> <c-u>
 noremap Y  y$
 noremap gup :s/\<./\u&/g<CR> & :noh<CR>
 noremap <C-@> i<C-@>
@@ -190,14 +195,16 @@ function! ConvertHashDefine2Switch()
 endfunction
 command! VKHashDefine2Switch call ConvertHashDefine2Switch()
 
+nnoremap <leader>q :call QuickfixToggle()<cr>
+
 "Function Key's Toggling!
 "--------------------------------------------------------------------------
 "set 2 window scroll
 map <F1> :set scb!<CR>
 map <F2> :GitGutterLineHighlightsToggle<CR>
 map <F3> :buffers<CR>:buffer<Space>
-nmap <F10> :!source ./.git/hooks/ide<CR>:silent cscope add ./.git/hooks/cscope.out<CR><CR>:silent cscope reset<CR><CR>
-autocmd BufWritePost c,cpp :!source ./.git/hooks/ide<CR>:silent cscope add ./.git/hooks/cscope.out<CR><CR>:silent cscope reset<CR><CR>
+nmap <F10> :!source ./.git/hooks/code_browser<CR>:silent cscope add ./.git/hooks/cscope.out<CR><CR>:silent cscope reset<CR><CR>
+autocmd BufWritePost c,cpp :!source ./.git/hooks/code_browser<CR>:silent cscope add ./.git/hooks/cscope.out<CR><CR>:silent cscope reset<CR><CR>
 
 "Leader Key Bindings
 let mapleader = ";"
@@ -211,8 +218,6 @@ noremap gj <C-W>j
 noremap gk <C-W>k
 noremap gh <C-W>h
 noremap gl <C-W>l
-set splitright
-set splitbelow
 
 " Seleting Window's
 noremap 1` 1<C-W>w
@@ -263,8 +268,10 @@ cnoreabbrev <expr> Qa ((getcmdtype() is# ':' && getcmdline() is# 'Qa')?('qa'):('
 cnoreabbrev <expr> Q ((getcmdtype() is# ':' && getcmdline() is# 'Q')?('q'):('Q'))
 
 " Managing tabs
-noremap <Tab> gt
-noremap <S-Tab> gT
+"noremap <Tab> gt
+"noremap <S-Tab> gT
+noremap ]t gt
+noremap [t gT
 
 noremap 0<Tab> 0gt
 noremap 1<Tab> 1gt
@@ -287,4 +294,6 @@ noremap<leader>te :tabedit <c-r>=expand("%:p:h")<CR>/
 "inoremap <-k> <Esc>:m .-2<CR>==gi
 vnoremap <Down> :m '>+1<CR>gv=gv
 vnoremap <Up> :m '<-2<CR>gv=gv
+
+noremap<Esc><Esc> <C-w><C-z>
 

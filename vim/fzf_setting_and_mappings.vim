@@ -1,4 +1,5 @@
 " FZF Plugin
+    let g:fzf_preview_window = 'right:65%'
     " An action can be a reference to a function that processes selected lines
     function! s:build_quickfix_list(lines)
       call setqflist(map(copy(a:lines), '{ "filename": v:val }'))
@@ -14,7 +15,8 @@
 
     " Default fzf layout
     " - down / up / left / right
-    let g:fzf_layout = { 'down': '~40%' }
+    let g:fzf_layout = { 'down': '~50%' }
+    "let g:fzf_layout = { 'tmux': '-p90%,60%' }
 
     " Customize fzf colors to match your color scheme
     let g:fzf_colors =
@@ -166,7 +168,10 @@
 
     command! FZFNeigh call s:fzf_neighbouring_files()
 
+    let g:fzf_commits_log_options = '--graph --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr"'
+
     nmap <space>f  :Files<CR>
+    nmap <space>r  :FZFMru<CR>
     nmap <space>g  :GFiles<CR>
     nmap <space>b  :Buffers<CR>
     nmap <space>w  :Windows<CR>
@@ -175,6 +180,8 @@
     nmap <space>t  :Tags<CR>
     nmap <space>bt :BTags<CR>
     nmap <space>s  :Snippets<CR>
+    nmap <space>c  :Commits<CR>
+    nmap <space>bc :BCommits<CR>
 
     " Insert mode completion
     "inoremap <c-x>t <plug>(fzf-complete-word)
